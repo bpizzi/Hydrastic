@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__.'/autoload.php';                                                                        // git://github.com/bpizzi/Silex.git (for Yaml and Finder integration)
+
+use Symfony\Component\Console\Application;
+use Hydra\HydraCommand\ProcessCommand;
+use Hydra\Container\TwigContainer;
+
+function l($v) { printf("\n\n---\n"); var_dump($v); printf("\n---\n\n"); }
+
+$hContainer = new Pimple();
+
+$hContainer['conf'] = array(
+	'hydraDir'          => __DIR__,
+	'websiteDir'        => __DIR__.'/../',
+	'txtDir'            => __DIR__."/../txt/",
+	'tplDir'            => __DIR__."/../tpl/",
+	'wwwDir'            => __DIR__."/../www/",
+	'wwwFileExtension'  => 'html',
+	'metaDatasDefaults' => array(
+							'template'    => 'post',
+							'title'       => 'Set your page title in metadatas !',
+							'description' => 'Set your page description in metadatas !',
+							'author'      => 'Set your page author in metadatas !',
+		)
+	);
+
+
+$hydra = new Application('Hydra', '0.1');
+
+$process = new ProcessCommand();
+$process->setHcontainer($hContainer);
+$hydra->add($process);
+
+$hydra->run();
