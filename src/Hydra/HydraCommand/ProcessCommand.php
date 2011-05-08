@@ -18,15 +18,10 @@ use Hydra\Container\TwigContainer;
  */
 class ProcessCommand extends SymfonyCommand
 {
-	protected $hConf = array();
-
 	protected $hContainer = array();
 
 	public function setHcontainer($hContainer)
 	{
-		
-		printf("\nloaded ProcessCommand->setHcontainer\n");
-
 		$this->hContainer = $hContainer;
 	}
 
