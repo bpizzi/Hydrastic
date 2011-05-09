@@ -16,13 +16,15 @@ use Hydra\Container\TwigContainer;
  *
  * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
  */
-class ProcessCommand extends SymfonyCommand
+class Process extends SymfonyCommand
 {
-	protected $hContainer = array();
+	protected $dic = array();
 
-	public function setHcontainer($hContainer)
+	public function __construct($dic)
 	{
-		$this->hContainer = $hContainer;
+		parent::__construct();
+		$this->dic = $dic;
+		return $this;
 	}
 
 	/**
@@ -51,7 +53,7 @@ EOF
 		$finder->files()
 			->ignoreVCS(true)
 			->name('*.txt')
-			->in($this->hContainer['conf']['txtDir']);
+			->in($this->dic['conf']['txtDir']);
 
 		foreach ($finder as $file) {
 			printf("Found $file...\n");
@@ -77,15 +79,15 @@ EOF
 				if($item == "") {
 					$item = $hydraConf['metaDatasDefaults'][$key];
 				}
-			}, $this->hContainer['conf']);
+			}, $this->dic['conf']);
 
 
 			// Get the content
 			$content = implode("\n", array_slice($fileArray, array_search("---", $fileArray) + 1, sizeof($fileArray)));  
 
 			// Generate the html
-			$this->hContainer['twig'] = $this->hContainer->share(function ($c) { return new TwigContainer($c); }); 
-			$html = $this->hContainer['twig']['parser']->render(
+			$this->dic['twig'] = $this->dic->share(function ($c) { return new TwigContainer($c); }); 
+			$html = $this->dic['twig']['parser']->render(
 				$metaDatas['template'].'.twig',
 				array_merge($metaDatas, array("content" => $content))
 			); 
@@ -96,12 +98,12 @@ EOF
 			if(isset($metaDatas['fileExtension']) && $metaDatas['fileExtension'] != "") {
 				$wwwFile .= '.'.$metaDatas['fileExtension'];
 			} else {
-				$wwwFile .= '.'.$this->hContainer['conf']['wwwFileExtension'];
+				$wwwFile .= '.'.$this->dic['conf']['wwwFileExtension'];
 			}
 
 			// Write the html
 			file_put_contents(
-				$this->hContainer['conf']['wwwDir'].$wwwFile,
+				$this->dic['conf']['wwwDir'].$wwwFile,
 				$html
 			);                                                     
 

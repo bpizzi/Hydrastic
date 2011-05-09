@@ -4,15 +4,16 @@
 require_once __DIR__.'/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Hydra\HydraCommand\ProcessCommand;
-use Hydra\HydraCommand\CompileCommand;
+use Hydra\HydraCommand\Process;
+use Hydra\HydraCommand\Compile;
+use Hydra\HydraCommand\Shell;
 use Hydra\Container\TwigContainer;
 
 function l($v) { printf("\n\n---\n"); var_dump($v); printf("\n---\n\n"); }
 
-$hContainer = new Pimple();
+$dic = new Pimple();
 
-$hContainer['conf'] = array(
+$dic['conf'] = array(
 	'version'           => '0.1',
 	'hydraDir'          => __DIR__,
 	'websiteDir'        => __DIR__.'/../',
@@ -21,21 +22,24 @@ $hContainer['conf'] = array(
 	'wwwDir'            => __DIR__."/../www/",
 	'wwwFileExtension'  => 'html',
 	'metaDatasDefaults' => array(
-				'template'    => 'post',
-				'title'       => 'Set your page title in metadatas !',
-				'description' => 'Set your page description in metadatas !',
-				'author'      => 'Set your page author in metadatas !',
-		)
-	);
+		'template'    => 'post',
+		'title'       => 'Set your page title in metadatas !',
+		'description' => 'Set your page description in metadatas !',
+		'author'      => 'Set your page author in metadatas !',
+	)
+);
 
-$hydra = new Application('Hydra',$hContainer['conf']['version']);
+$dic['hydraApp'] = new Application('Hydra',$dic['conf']['version']);
 
-$process = new ProcessCommand();
-$process->setHcontainer($hContainer);
-$hydra->add($process);
+$hydraCommands = array(
+	new Process($dic), 
+	new Compile($dic), //TODO: do not add tis command in PHAR mode
+	new Shell($dic),
+);
 
-$compile = new CompileCommand();
-$compile->setHcontainer($hContainer);
-$hydra->add($compile); //TODO: do not add tis command in PHAR mode
+foreach ($hydraCommands as $c) {
+	$dic['hydraApp']->add($c);
+}
 
-$hydra->run();
+$dic['hydraApp']->run();
+

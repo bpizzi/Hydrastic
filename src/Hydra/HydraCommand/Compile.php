@@ -13,14 +13,16 @@ use Symfony\Component\Finder\Finder;
 /**
  * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
  */
-class CompileCommand extends SymfonyCommand
+class Compile extends SymfonyCommand
 {
 
-	protected $hContainer = array();
+	protected $dic = array();
 
-	public function setHcontainer($hContainer)
+	public function __construct($dic)
 	{
-		$this->hContainer = $hContainer;
+		parent::__construct();
+		$this->dic = $dic;
+		return $this;
 	}
 
 	/**
@@ -45,14 +47,20 @@ EOF
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-
+		$verbose = false;
+		if($input->getOption('v')) {
+			$verbose = true;
+		}
 		
 		$pharFile = $input->getArgument('pharfile');
         if (file_exists($pharFile)) {
+			if($verbose) $output->writeln('<info>[info]</info> Deleting existing archive');
             unlink($pharFile);
         }
 
-        $phar = new \Phar($pharFile, 0, 'Silex');
+
+		if($verbose) $output->writeln('<info>[info]</info> Creating archive : '.$pharFile);
+        $phar = new \Phar($pharFile, 0, 'Hydra');
         $phar->setSignatureAlgorithm(\Phar::SHA1);
 
         $phar->startBuffering();
@@ -71,6 +79,7 @@ EOF
         ;
 
         foreach ($finder as $file) {
+			if($verbose) $output->writeln('<info>[info]</info> Adding file to archive : '.$file);
             $this->addFile($phar, $file);
         }
 
@@ -98,7 +107,7 @@ EOF
             $content = $this->stripComments($content);
         }
 
-        $content = str_replace('@package_version@', $this->hContainer['conf']['version'], $content);
+        $content = str_replace('@package_version@', $this->dic['conf']['version'], $content);
 
         $phar->addFromString($path, $content);
     }
