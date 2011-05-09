@@ -56,12 +56,16 @@ EOF
 			->in($this->dic['conf']['txtDir']);
 
 		foreach ($finder as $file) {
-			printf("Found $file...\n");
+
+			$verbose = false;
+			if($input->getOption('v')) {
+				$verbose = true;
+			}
 
 			// The name of the final html file is, by default, the name of the txt file
 			$wwwFile = reset(explode('.', end(explode('/',$file))));
 
-			printf("Processing $wwwFile...");
+			if($verbose) $output->writeln('<info>[info]</info> Processing file '.$wwwFile);
 
 			// Get rid of CR and spaces
 			$fileArray = file($file);
@@ -107,10 +111,10 @@ EOF
 				$html
 			);                                                     
 
-			printf(" successfully writed ".str_replace(__DIR__.'/', '', $wwwFile)." !\n");
+			if($verbose) $output->writeln('<info>[info]</info> Successfully writed '.str_replace(__DIR__.'/', '', $wwwFile));
 		}
 
-		printf("Done !\n");
+		if($verbose) $output->writeln('<info>[info]</info> Done.');
 
 	}
 }
