@@ -22,7 +22,6 @@ class Compile extends SymfonyCommand
 	{
 		parent::__construct();
 		$this->dic = $dic;
-		return $this;
 	}
 
 	/**

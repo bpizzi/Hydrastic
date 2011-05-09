@@ -9,8 +9,6 @@ use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
 use Hydra\Container\TwigContainer;
 
-function l($v) { printf("\n\n---\n"); var_dump($v); printf("\n---\n\n"); }
-
 $dic = new Pimple();
 
 $dic['conf'] = array(
