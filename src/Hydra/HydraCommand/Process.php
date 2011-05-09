@@ -7,10 +7,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Parser as YamlParser;
-
-use Hydra\Container\TwigContainer;
 
 /**
  *
@@ -48,13 +44,9 @@ EOF
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 
-		$finder = new Finder();
-		$finder->files()
-			->ignoreVCS(true)
-			->name('*.txt')
-			->in($this->dic['conf']['txtDir']);
+		$files = $this->dic['finder']['txtFiles'];
 
-		foreach ($finder as $file) {
+		foreach ($files as $file) {
 
 			$verbose = false;
 			if($input->getOption('v')) {
@@ -76,8 +68,7 @@ EOF
 			$metaDatasStr =  implode("\n", array_slice($fileArray, 0, array_search("---", $fileArray)));                 
 
 			// Parse the metadatas in a array, using defaults when necessary
-			$yamlParser = new YamlParser();
-			$metaDatas = $yamlParser->parse($metaDatasStr);
+			$metaDatas = $this->dic['yaml']['parser']->parse($metaDatasStr);
 			array_walk($metaDatas, function(&$item, $key, $hydraConf) {
 				if($item == "") {
 					$item = $hydraConf['metaDatasDefaults'][$key];
@@ -89,7 +80,6 @@ EOF
 			$content = implode("\n", array_slice($fileArray, array_search("---", $fileArray) + 1, sizeof($fileArray)));  
 
 			// Generate the html
-			$this->dic['twig'] = $this->dic->share(function ($c) { return new TwigContainer($c); }); 
 			$html = $this->dic['twig']['parser']->render(
 				$metaDatas['template'].'.twig',
 				array_merge($metaDatas, array("content" => $content))

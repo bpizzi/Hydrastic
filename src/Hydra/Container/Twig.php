@@ -4,7 +4,7 @@ namespace Hydra\Container;
 
 use Pimple;
 
-class TwigContainer extends Pimple
+class Twig extends Pimple
 {
 
 	public function __construct($c) {
