@@ -1,6 +1,6 @@
 <?php
 
-namespace Hydra\Container;
+namespace Hydra\Service;
 
 use Symfony\Component\Yaml\Parser;
 use Pimple;

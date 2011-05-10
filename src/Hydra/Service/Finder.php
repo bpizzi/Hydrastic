@@ -1,6 +1,6 @@
 <?php
 
-namespace Hydra\Container;
+namespace Hydra\Service;
 
 use Symfony\Component\Finder\Finder as SymfonyFinder;
 use Pimple;

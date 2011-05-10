@@ -7,9 +7,9 @@ use Symfony\Component\Console\Application;
 use Hydra\HydraCommand\Process;
 use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
-use Hydra\Container\Twig as TwigContainer;
-use Hydra\Container\Yaml as YamlContainer;
-use Hydra\Container\Finder as FinderContainer;
+use Hydra\Service\Twig as TwigService;
+use Hydra\Service\Yaml as YamlService;
+use Hydra\Service\Finder as FinderService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
@@ -31,7 +31,7 @@ function MergeArrays($Arr1, $Arr2)
 }
 
 // Register services that do not depends on config
-$dic['yaml']   = $dic->share(function ($c) { return new YamlContainer($c); });
+$dic['yaml']   = $dic->share(function ($c) { return new YamlService($c); });
 
 // Set the working directory correctly and read/set the conf 
 // depending on being in a phar archive or not.
@@ -55,8 +55,8 @@ if( $workingDir == '' ) {
 $dic['conf'] = MergeArrays($defaultConf, $userConf);
 
 // Register services
-$dic['twig']   = $dic->share(function ($c) { return new TwigContainer($c); });
-$dic['finder'] = $dic->share(function ($c) { return new FinderContainer($c); });
+$dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });
+$dic['finder'] = $dic->share(function ($c) { return new FinderService($c); });
 
 // Declare (Symfony Component) Application 
 $dic['hydraApp'] = new Application('Hydra',$dic['conf']['version']);
