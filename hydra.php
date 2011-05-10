@@ -40,8 +40,10 @@ if( $workingDir == '' ) {
 	if(file_exists($userConfFile)) {
 		Phar::mount('hydra-conf.yml', $userConfFile);
 		$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydra-conf.yml'));
+		$dic['userConfDefined'] = true;
 	} else {
-		die('hydra-conf.yml not found, please create it first');
+		$dic['userConfDefined'] = false;
+		$userConf = array();
 	}
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
 }

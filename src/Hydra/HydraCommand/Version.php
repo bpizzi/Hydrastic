@@ -1,14 +1,11 @@
 <?php 
 namespace Hydra\HydraCommand;
 
-//use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Shell as SymfonyShell;
-
 
 /**
  * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
@@ -36,7 +33,7 @@ class Version extends SymfonyCommand
 				))
 				->setDescription('What version of Hydra are you using right now ?')
 				->setHelp(<<<EOF
-The <info>hydra:version</info> let you know what version of Hydra you are using
+The <info>hydra:version</info> command let you know what version of Hydra you are using
 EOF
 		);
 

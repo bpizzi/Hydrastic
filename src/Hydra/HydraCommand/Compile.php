@@ -1,7 +1,6 @@
 <?php 
 namespace Hydra\HydraCommand;
 
-//use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,7 +40,7 @@ class Compile extends SymfonyCommand
 			->addArgument('pharfile', InputArgument::OPTIONAL, '', 'hydra.phar')
 			->setDescription('Compile Hydra files into a PHAR archive')
 			->setHelp(<<<EOF
-The <info>hydra:compile</info> skrink down Hydra to a single PHAR archive that you can easily embed into your website directory.
+The <info>hydra:compile</info> command skrink down Hydra to a single PHAR archive that you can easily embed into your website directory.
 EOF
 		);
 

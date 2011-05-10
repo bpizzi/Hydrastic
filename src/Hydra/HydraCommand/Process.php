@@ -1,7 +1,6 @@
 <?php 
 namespace Hydra\HydraCommand;
 
-//use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,7 +38,7 @@ class Process extends SymfonyCommand
 			))
 			->setDescription('Generate your website')
 			->setHelp(<<<EOF
-The <info>hydra:process</info> generate your website !
+The <info>hydra:process</info> command generate your website !
 EOF
 		);
 
