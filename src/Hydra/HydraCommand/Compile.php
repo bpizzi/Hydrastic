@@ -17,6 +17,8 @@ class Compile extends SymfonyCommand
 {
 
 	protected $dic = array();
+	protected $verbose = false;
+	protected $veryverbose = false;
 
 	public function __construct($dic)
 	{
@@ -33,6 +35,7 @@ class Compile extends SymfonyCommand
 			->setName('hydra:compile')
 			->setDefinition(array(
 				new InputOption('v', '', InputOption::VALUE_NONE, 'Be verbose or not'),
+				new InputOption('vv', '', InputOption::VALUE_NONE, 'Be very verbose or shut the fuck up'),
 				new InputOption('gz', '', InputOption::VALUE_NONE, 'GZip compression of the archive'),
 			))
 			->addArgument('pharfile', InputArgument::OPTIONAL, '', 'hydra.phar')
@@ -46,94 +49,108 @@ EOF
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$verbose = false;
 		if($input->getOption('v')) {
-			$verbose = true;
+			$this->verbose = true;
+			$this->veryverbose = false;
+		} 
+		if($input->getOption('vv')) {
+			$this->verbose = true;
+			$this->veryverbose = true;
 		}
-		
+
 		$pharFile = $input->getArgument('pharfile');
-        if (file_exists($pharFile)) {
-			if($verbose) $output->writeln('<info>[info]</info> Deleting existing archive');
-            unlink($pharFile);
-        }
+		if (file_exists($pharFile)) {
+			if($this->verbose) $output->writeln('<info>[info]</info> Deleting existing archive');
+			unlink($pharFile);
+		}
 
 
-		if($verbose) $output->writeln('<info>[info]</info> Creating archive : '.$pharFile);
-        $phar = new \Phar($pharFile, 0, 'Hydra');
-        $phar->setSignatureAlgorithm(\Phar::SHA1);
+		if($this->verbose) $output->writeln('<info>[info]</info> Creating archive : '.$pharFile);
+		$phar = new \Phar($pharFile, 0, 'Hydra');
+		$phar->setSignatureAlgorithm(\Phar::SHA1);
 
-        $phar->startBuffering();
+		$phar->startBuffering();
 
-        $finder = new Finder();
-        $finder->files()
-            ->ignoreVCS(true)
-            ->name('*.php')
-            ->notName('Compiler.php')
-            ->in(__DIR__.'/../..')
-            ->in(__DIR__.'/../../../vendor/pimple')
-            ->in(__DIR__.'/../../../vendor/Symfony/Component/ClassLoader')
-            ->in(__DIR__.'/../../../vendor/Symfony/Component/Console')
-            ->in(__DIR__.'/../../../vendor/Symfony/Component/Finder')
-            ->in(__DIR__.'/../../../vendor/Symfony/Component/Yaml')
-        ;
+		$finder = new Finder();
+		$finder->files()
+			->ignoreVCS(true)
+			->name('*.php')
+			->notName('Compiler.php')
+			->in(__DIR__.'/../..')
+			->in(__DIR__.'/../../../vendor/pimple')
+			->in(__DIR__.'/../../../vendor/Symfony/Component/ClassLoader')
+			->in(__DIR__.'/../../../vendor/Symfony/Component/Console')
+			->in(__DIR__.'/../../../vendor/Symfony/Component/Finder')
+			->in(__DIR__.'/../../../vendor/Symfony/Component/Yaml')
+			->in(__DIR__.'/../../../vendor/twig/lib')
+			;
 
-        foreach ($finder as $file) {
-			if($verbose) $output->writeln('<info>[info]</info> Adding file to archive : '.$file);
-            $this->addFile($phar, $file);
-        }
+		foreach ($finder as $file) {
+			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file->getRealPath());
+			if($this->verbose) $output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+			$this->addFile($phar, $filepath);
+		}
 
-        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../../LICENSE'), false);
-        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../../autoload.php'));
-        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../../hydra.php'));
+		$otherFiles = array(
+			'hydra.php',
+			'autoload.php',
+			'hydra-default-conf.yml',
+			'LICENSE',
+			'vendor/twig/lib/Twig/Compiler.php', //TODO: see why this file isn't loaded by $finder...
+		);
+		foreach ($otherFiles as $file) {
+			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file);
+			if($this->verbose) $output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+			$this->addFile($phar, $filepath);
+		}
 
-        // Stubs
-        $phar->setDefaultStub('hydra.php');
+		// Stubs
+		$phar->setDefaultStub('hydra.php');
 
-        $phar->stopBuffering();
+		$phar->stopBuffering();
 
 		if($input->hasOption('gz')) {
 			$phar->compressFiles(\Phar::GZ);
 		}
 
-        unset($phar);
-    }
+		unset($phar);
+	}
 
-    protected function addFile($phar, $file, $strip = true)
-    {
-        $path = str_replace(realpath(__DIR__.'/../../..').'/', '', $file->getRealPath());
-        $content = file_get_contents($file);
-        if ($strip) {
-            $content = $this->stripComments($content);
-        }
+	protected function addFile($phar, $file, $strip = true)
+	{
+		$content = file_get_contents($file);
+		if ($strip) {
+			$content = $this->stripComments($content);
+		}
 
-        $content = str_replace('@package_version@', $this->dic['conf']['version'], $content);
+		$content = str_replace('@package_version@', $this->dic['conf']['version'], $content);
 
-        $phar->addFromString($path, $content);
-    }
+		$phar->addFromString($file, $content);
+	}
 
 	/**
 	 * From Symfony2 HttpKernel Component
 	 */
-    protected function stripComments($source)
-    {
-        if (!function_exists('token_get_all')) {
-            return $source;
-        }
+	protected function stripComments($source)
+	{
+		if (!function_exists('token_get_all')) {
+			return $source;
+		}
 
-        $output = '';
-        foreach (token_get_all($source) as $token) {
-            if (is_string($token)) {
-                $output .= $token;
-            } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
-            }
-        }
+		$output = '';
+		foreach (token_get_all($source) as $token) {
+			if (is_string($token)) {
+				$output .= $token;
+			} elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+				$output .= $token[1];
+			}
+		}
 
-        // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
+		// replace multiple new lines with a single newline
+		$output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
 
-        return $output;
-    }
+		return $output;
+	}
 
 }
 

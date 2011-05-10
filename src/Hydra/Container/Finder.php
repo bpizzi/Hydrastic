@@ -15,11 +15,14 @@ class Finder extends Pimple
 		});
 
 		$this['txtFiles'] = $this->share(function () use ($c) {
+			$txtDir = $c['workingDirectory'].'/'.$c['conf']['txtDir'].'/';
+			$extention = '*.'.$c['conf']['txtFileExtension'];
 			$f = new SymfonyFinder();
-			return $f->files()
+			$f->files()
 				->ignoreVCS(true)
-				->name('*.'.$c['conf']['txtFileExtension'])
-				->in($c['conf']['txtDir']);
+				->name($extention)
+				->in($txtDir);
+			return iterator_to_array($f);
 		});                         
 
 	}

@@ -1,0 +1,11 @@
+version: 0.1
+txtDir: txt
+tplDir: tpl
+wwwDir: www
+wwwFileExtension: html
+txtFileExtension: txt
+metaDatasDefaults:
+  template: post
+  title: Please override me !
+  description: Please override me !
+  author: Please override me !
