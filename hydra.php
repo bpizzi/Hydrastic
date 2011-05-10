@@ -57,10 +57,13 @@ $dic['hydraApp'] = new Application('Hydra',$dic['conf']['version']);
 // Add commands to the Application object
 $hydraCommands = array(
 	new Process($dic), 
-	new Compile($dic), //TODO: do not add this command in PHAR mode
 	new Shell($dic),
 	new Version($dic),
 );
+if(!$dic['insidePhar']) {
+	$hydraCommands[] = new Compile($dic);
+}
+
 foreach ($hydraCommands as $c) {
 	$dic['hydraApp']->add($c);
 }
