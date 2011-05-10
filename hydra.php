@@ -7,6 +7,7 @@ use Symfony\Component\Console\Application;
 use Hydra\HydraCommand\Process;
 use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
+use Hydra\HydraCommand\Version;
 use Hydra\Service\Twig as TwigService;
 use Hydra\Service\Yaml as YamlService;
 use Hydra\Service\Finder as FinderService;
@@ -41,15 +42,20 @@ if( $workingDir == '' ) {
 	$dic['insidePhar'] = false;
 	$dic['workingDirectory'] = dirname(__DIR__);
 	$dic['hydraDir'] = __DIR__;
-	$userConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml'));
-	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/../hydra-conf.yml')); 
+	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml'));
+	$userConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/../hydra-conf.yml')); 
 } else {
 	//Currently inside a phar archive
 	$dic['insidePhar'] = true;
 	$dic['workingDirectory'] = str_replace(array('phar:/','hydra.phar'), '', $workingDir);
 	$dic['hydraDir'] = Phar::running();
-	Phar::mount('hydra-conf.yml', $workingDir.'/hydra-conf.yml');
-	$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydra-conf.yml'));
+	$userConfFile = $workingDir.'/hydra-conf.yml';
+	if(file_exists($userConfFile)) {
+		Phar::mount('hydra-conf.yml', $userConfFile);
+		$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydra-conf.yml'));
+	} else {
+		die('hydra-conf.yml not found, please create it first');
+	}
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
 }
 $dic['conf'] = MergeArrays($defaultConf, $userConf);
@@ -66,6 +72,7 @@ $hydraCommands = array(
 	new Process($dic), 
 	new Compile($dic), //TODO: do not add this command in PHAR mode
 	new Shell($dic),
+	new Version($dic),
 );
 foreach ($hydraCommands as $c) {
 	$dic['hydraApp']->add($c);
