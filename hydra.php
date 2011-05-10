@@ -4,6 +4,7 @@
 require_once __DIR__.'/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Hydra\ArrayMerger;
 use Hydra\HydraCommand\Process;
 use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
@@ -16,20 +17,6 @@ use Hydra\Service\Finder as FinderService;
 // It holds configuration variables and services
 // Services are utility object lazily loaded throughout the command
 $dic = new Pimple();
-
-function MergeArrays($Arr1, $Arr2)
-{
-	foreach($Arr2 as $key => $Value)
-	{
-		if(array_key_exists($key, $Arr1) && is_array($Value)) {
-			$Arr1[$key] = MergeArrays($Arr1[$key], $Arr2[$key]);
-		} else {
-
-			$Arr1[$key] = $Value;
-		}
-	}
-	return $Arr1;
-}
 
 // Register services that do not depends on config
 $dic['yaml']   = $dic->share(function ($c) { return new YamlService($c); });
@@ -58,7 +45,7 @@ if( $workingDir == '' ) {
 	}
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
 }
-$dic['conf'] = MergeArrays($defaultConf, $userConf);
+$dic['conf'] = ArrayMerger::Merge($defaultConf, $userConf);
 
 // Register services
 $dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });
