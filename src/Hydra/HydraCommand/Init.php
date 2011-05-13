@@ -146,16 +146,21 @@ EOF
 			//Dumping configuration to yml and creating folders
 			$output->writeln('---');
 			foreach ($folderConf as $k => $folder) {
-				if (is_dir($folder) || !mkdir($folder)) {
-					$output->writeln('<error>[error]</error> Creation of the folder failed.');
+				if (false === is_dir($this->dic['working_directory'].'/'.$folder)) {
+					if(false === @mkdir($folder)) {
+						$output->writeln('<error>[error]</error> Creation of the folder "'.$folder.'" failed.');
+					} else {
+						$output->writeln($this->dic['conf']['command_prefix'].' Folder created : <info>'.$folder.'/</info>');
+					}
 				} else {
-					$output->writeln($this->dic['conf']['command_prefix'].' Folder created : <info>'.$folder.'/</info>');
+					$output->writeln($this->dic['conf']['command_prefix'].' Folder already exists : <info>'.$folder.'/</info>');
 				}
 			}
 			$masterConfig = array_merge_recursive($folderConf, array('metadata_defaults' => $siteConf));
 			$dumper = $this->dic['yaml']['dumper'];
 			file_put_contents('hydra-conf.yml',$dumper->dump($masterConfig));
 
+			//Done ! :)
 			$output->writeln($this->dic['conf']['command_prefix'].' Configuration file writed to disc.');
 			$output->writeln($this->dic['conf']['command_prefix'].' You can begin to write your templates and text files and try <info>hydra:process</info> command to generate you static content!');
 
