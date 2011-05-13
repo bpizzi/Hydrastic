@@ -160,7 +160,9 @@ EOF
 			$output->writeln($this->dic['conf']['command_prefix'].' You can begin to write your templates and text files and try <info>hydra:process</info> command to generate you static content!');
 
 
-		} //-- creation of a user config file
+		} else {
+			$output->writeln($this->dic['conf']['command_prefix'].' I can see you already have a configuration file. Please delete it before running me again.');
+		}//-- creation of a user config file
 
 
 	}
