@@ -64,7 +64,7 @@ EOF
 
 			// Look for folders in current directory 
 			$f = $this->dic['finder']['find'];
-			$f->directories()->in($this->dic['working_directory']);
+			$f->directories()->depth('< 2')->in($this->dic['working_directory']);
 
 			//Foreach folder we found, ask which type of file it should be used for
 			foreach ($f as $d) {
@@ -90,6 +90,10 @@ EOF
 					$folderConf[$response.'_dir'] = $d->getRelativePathname();
 				}
 				$output->writeln('---');
+				if(false === in_array(null,$folderConf)) {
+					//If every folder conf key has been defined, quit the loop
+					break;
+				}
 			} //-- ask the user what should be existing folders used for
 
 			if (iterator_count($f) == 0 ) {
