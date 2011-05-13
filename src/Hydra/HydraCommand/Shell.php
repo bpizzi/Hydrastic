@@ -30,11 +30,9 @@ class Shell extends SymfonyCommand
 	{
 		$this
 			->setName('hydra:shell')
-			->setDefinition(array(
-				//new InputOption('v', '', InputOption::VALUE_NONE, 'Be verbose or not'),
-				))
-				->setDescription('Run hydra shell')
-				->setHelp(<<<EOF
+			->setDefinition(array())
+			->setDescription('Run hydra shell')
+			->setHelp(<<<EOF
 The <info>hydra:shell</info> command allow you to interact with hydra commands in its own shell
 EOF
 		);

@@ -16,8 +16,6 @@ class Compile extends SymfonyCommand
 {
 
 	protected $dic = array();
-	protected $verbose = false;
-	protected $veryverbose = false;
 
 	public function __construct($dic)
 	{
@@ -33,8 +31,6 @@ class Compile extends SymfonyCommand
 		$this
 			->setName('hydra:compile')
 			->setDefinition(array(
-				new InputOption('v', '', InputOption::VALUE_NONE, 'Be verbose or not'),
-				new InputOption('vv', '', InputOption::VALUE_NONE, 'Be very verbose or shut the fuck up'),
 				new InputOption('gz', '', InputOption::VALUE_NONE, 'GZip compression of the archive'),
 			))
 			->addArgument('pharfile', InputArgument::OPTIONAL, '', 'hydra.phar')
@@ -48,23 +44,14 @@ EOF
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		if($input->getOption('v')) {
-			$this->verbose = true;
-			$this->veryverbose = false;
-		} 
-		if($input->getOption('vv')) {
-			$this->verbose = true;
-			$this->veryverbose = true;
-		}
-
 		$pharFile = $input->getArgument('pharfile');
 		if (file_exists($pharFile)) {
-			if($this->verbose) $output->writeln('<info>[info]</info> Deleting existing archive');
+			$output->writeln('<info>[info]</info> Deleting existing archive');
 			unlink($pharFile);
 		}
 
 
-		if($this->verbose) $output->writeln('<info>[info]</info> Creating archive : '.$pharFile);
+		$output->writeln('<info>[info]</info> Creating archive : '.$pharFile);
 		$phar = new \Phar($pharFile, 0, 'Hydra');
 		$phar->setSignatureAlgorithm(\Phar::SHA1);
 
@@ -86,7 +73,9 @@ EOF
 
 		foreach ($finder as $file) {
 			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file->getRealPath());
-			if($this->verbose) $output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+			if($output->getVerbosity()==2) {
+				$output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+			}
 			$this->addFile($phar, $filepath);
 		}
 
@@ -99,7 +88,9 @@ EOF
 		);
 		foreach ($otherFiles as $file) {
 			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file);
-			if($this->verbose) $output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+			if($output->getVerbosity()==2) {
+				$output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+			}
 			$this->addFile($phar, $filepath);
 		}
 
@@ -108,11 +99,12 @@ EOF
 
 		$phar->stopBuffering();
 
-		if($input->hasOption('gz')) {
+		if($input->getOption('gz')) {
 			$phar->compressFiles(\Phar::GZ);
 		}
 
 		unset($phar);
+		$output->writeln('<info>[info]</info> Done: compiled Hydra to hydra.phar');
 	}
 
 	protected function addFile($phar, $file, $strip = true)

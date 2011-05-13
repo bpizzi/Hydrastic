@@ -16,8 +16,6 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
 class Process extends SymfonyCommand
 {
 	protected $dic = array();
-    protected $verbose = false;
-	protected $veryverbose = false;
 
 	public function __construct($dic)
 	{
@@ -32,10 +30,7 @@ class Process extends SymfonyCommand
 	{
 		$this
 			->setName('hydra:process')
-			->setDefinition(array(
-				new InputOption('v', '', InputOption::VALUE_NONE, 'Be verbose or not'),
-				new InputOption('vv', '', InputOption::VALUE_NONE, 'Be very verbose or shut the fuck up'),
-			))
+			->setDefinition(array())
 			->setDescription('Generate your website')
 			->setHelp(<<<EOF
 The <info>hydra:process</info> command generate your website !
@@ -47,27 +42,18 @@ EOF
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 
-		if($input->getOption('v')) {
-			$this->verbose = true;
-			$this->veryverbose = false;
-		} 
-		if($input->getOption('vv')) {
-			$this->verbose = true;
-			$this->veryverbose = true;
-		}
-
-		if($this->veryverbose) $output->writeln('<info>[info]</info> Started hydration of your text files');
+		$output->writeln('<info>[info]</info> Started hydration of your text files');
 
 		$files = $this->dic['finder']['txt_files'];
 
-		if($this->veryverbose) $output->writeln('<info>[info]</info> Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
+		$output->writeln('<info>[info]</info> Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
 
 		foreach ($files as $file) {
 
 			// The name of the final html file is, by default, the name of the txt file
 			$wwwFile = reset(explode('.', end(explode('/',$file->getRealPath()))));
 
-			if($this->verbose) $output->writeln('<info>[info]</info> Processing file <comment>'.$wwwFile.' ('.$file.')</comment>');
+			$output->writeln('<info>[info]</info> Processing file <comment>'.$wwwFile.' ('.$file.')</comment>');
 
 			// Get rid of CR and spaces
 			$fileArray = file($file);
@@ -91,13 +77,13 @@ EOF
 			$content = implode("\n", array_slice($fileArray, array_search("---", $fileArray) + 1, sizeof($fileArray)));  
 
 			// Generate the html
-			if($this->veryverbose) {
+			if($output->getVerbosity()==2) {
 				foreach ($metaDatas as $k => $v) {
 					$output->writeln('  <info>[info]</info> ... with metadata <comment>'.$k.'</comment> => <comment>'.$v.'</comment>');
 				}
 				$output->writeln('  <info>[info]</info> ... and a content of <comment>'.strlen($content).'</comment> char(s) (<comment>'.str_word_count($content).'</comment> word(s))');
-
 			}
+
 			$html = $this->dic['twig']['parser']->render(
 				$metaDatas['template'].'.twig',
 				array_merge($metaDatas, array("content" => $content))
@@ -118,10 +104,10 @@ EOF
 				$html
 			);                                                     
 
-			if($this->verbose) $output->writeln('<info>[info]</info> Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $wwwFile).'</comment>');
+			$output->writeln('<info>[info]</info> Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $wwwFile).'</comment>');
 		}
 
-		if($this->verbose) $output->writeln('<info>[info]</info> Done.');
+		$output->writeln('<info>[info]</info> Done.');
 
 	}
 }

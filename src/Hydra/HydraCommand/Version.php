@@ -28,11 +28,9 @@ class Version extends SymfonyCommand
 	{
 		$this
 			->setName('hydra:version')
-			->setDefinition(array(
-				//new InputOption('v', '', InputOption::VALUE_NONE, 'Be verbose or not'),
-				))
-				->setDescription('What version of Hydra are you using right now ?')
-				->setHelp(<<<EOF
+			->setDefinition(array())
+			->setDescription('What version of Hydra are you using right now ?')
+			->setHelp(<<<EOF
 The <info>hydra:version</info> command let you know what version of Hydra you are using
 EOF
 		);
@@ -56,7 +54,7 @@ o888o   o888o     o888o     o888bood8P'   o888o  o888o o88o     o8888o
  Static content generator - Baptiste Pizzighini <baptiste@bpizzi.fr>
 ----------------------------------------------------------------------
 EOF
-		);
+	);
 
 	}
 

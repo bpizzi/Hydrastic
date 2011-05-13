@@ -30,10 +30,7 @@ class Init extends SymfonyCommand
 	{
 		$this
 			->setName('hydra:init')
-			->setDefinition(array(
-				new InputOption('v', '', InputOption::VALUE_NONE, 'Be verbose or not'),
-				new InputOption('vv', '', InputOption::VALUE_NONE, 'Be very verbose or shut the fuck up'),
-			))
+			->setDefinition(array())
 			->setDescription('Initiate folder structure and config file')
 			->setHelp(<<<EOF
 The <info>hydra:init</info> command checks if the current directory could be used for holding your txt/twig/html files.
