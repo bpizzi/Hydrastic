@@ -43,7 +43,7 @@ EOF
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$hydraShell = new SymfonyShell($this->dic['hydraApp']);
+		$hydraShell = new SymfonyShell($this->dic['hydra_app']);
 		$hydraShell->run();
 	}
 

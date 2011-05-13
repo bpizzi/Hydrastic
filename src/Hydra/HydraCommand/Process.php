@@ -58,9 +58,9 @@ EOF
 
 		if($this->veryverbose) $output->writeln('<info>[info]</info> Started hydration of your text files');
 
-		$files = $this->dic['finder']['txtFiles'];
+		$files = $this->dic['finder']['txt_files'];
 
-		if($this->veryverbose) $output->writeln('<info>[info]</info> Found <comment>'.count($files).' '.$this->dic['conf']['txtFileExtension'].'</comment> files');
+		if($this->veryverbose) $output->writeln('<info>[info]</info> Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
 
 		foreach ($files as $file) {
 
@@ -82,7 +82,7 @@ EOF
 			$metaDatas = $this->dic['yaml']['parser']->parse($metaDatasStr);
 			array_walk($metaDatas, function(&$item, $key, $hydraConf) {
 				if($item == "") {
-					$item = $hydraConf['metaDatasDefaults'][$key];
+					$item = $hydraConf['metadata_defaults'][$key];
 				}
 			}, $this->dic['conf']);
 
@@ -103,18 +103,18 @@ EOF
 				array_merge($metaDatas, array("content" => $content))
 			); 
 
-			if(isset($metaDatas['fileName']) && $metaDatas['fileName'] != "") {
-				$wwwFile = $metaDatas['fileName'];
+			if(isset($metaDatas['filename']) && $metaDatas['filename'] != "") {
+				$wwwFile = $metaDatas['filename'];
 			}
-			if(isset($metaDatas['fileExtension']) && $metaDatas['fileExtension'] != "") {
-				$wwwFile .= '.'.$metaDatas['fileExtension'];
+			if(isset($metaDatas['file_extension']) && $metaDatas['file_extension'] != "") {
+				$wwwFile .= '.'.$metaDatas['file_extension'];
 			} else {
-				$wwwFile .= '.'.$this->dic['conf']['wwwFileExtension'];
+				$wwwFile .= '.'.$this->dic['conf']['www_file_extension'];
 			}
 
 			// Write the html
 			file_put_contents(
-				$this->dic['workingDirectory'].'/'.$this->dic['conf']['wwwDir'].'/'.$wwwFile,
+				$this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/'.$wwwFile,
 				$html
 			);                                                     
 

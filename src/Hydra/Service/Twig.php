@@ -9,12 +9,12 @@ class Twig extends Pimple
 
 	public function __construct($c) {
 
-		require_once $c['hydraDir'].'/vendor/twig/lib/Twig/Autoloader.php';
+		require_once $c['hydra_dir'].'/vendor/twig/lib/Twig/Autoloader.php';
 
 		\Twig_Autoloader::register();
 
 		$this['parser'] = $this->share(function () use ($c) {
-			$tplDir = $c['workingDirectory'].'/'.$c['conf']['tplDir'];
+			$tplDir = $c['working_directory'].'/'.$c['conf']['tpl_dir'];
 			$loader = new \Twig_Loader_Filesystem($tplDir);
 			$twig = new \Twig_Environment($loader, array());
 

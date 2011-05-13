@@ -9,6 +9,7 @@ use Hydra\HydraCommand\Process;
 use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
 use Hydra\HydraCommand\Version;
+use Hydra\HydraCommand\Init;
 use Hydra\Service\Twig as TwigService;
 use Hydra\Service\Yaml as YamlService;
 use Hydra\Service\Finder as FinderService;
@@ -26,23 +27,23 @@ $dic['yaml']   = $dic->share(function ($c) { return new YamlService($c); });
 $workingDir = dirname(Phar::running(false));
 if( $workingDir == '' ) {
 	//Currently outside a phar archive
-	$dic['insidePhar'] = false;
-	$dic['workingDirectory'] = dirname(__DIR__);
-	$dic['hydraDir'] = __DIR__;
+	$dic['inside_phar'] = false;
+	$dic['working_directory'] = dirname(__DIR__);
+	$dic['hydra_dir'] = __DIR__;
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml'));
 	$userConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/../hydra-conf.yml')); 
 } else {
 	//Currently inside a phar archive
-	$dic['insidePhar'] = true;
-	$dic['workingDirectory'] = str_replace(array('phar:/','hydra.phar'), '', $workingDir);
-	$dic['hydraDir'] = Phar::running();
+	$dic['inside_phar'] = true;
+	$dic['working_directory'] = str_replace(array('phar:/','hydra.phar'), '', $workingDir);
+	$dic['hydra_dir'] = Phar::running();
 	$userConfFile = $workingDir.'/hydra-conf.yml';
 	if(file_exists($userConfFile)) {
 		Phar::mount('hydra-conf.yml', $userConfFile);
 		$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydra-conf.yml'));
-		$dic['userConfDefined'] = true;
+		$dic['user_conf_defined'] = true;
 	} else {
-		$dic['userConfDefined'] = false;
+		$dic['user_conf_defined'] = false;
 		$userConf = array();
 	}
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
@@ -54,22 +55,23 @@ $dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });
 $dic['finder'] = $dic->share(function ($c) { return new FinderService($c); });
 
 // Declare (Symfony Component) Application 
-$dic['hydraApp'] = new Application('Hydra',$dic['conf']['version']);
+$dic['hydra_app'] = new Application('Hydra',$dic['conf']['version']);
 
 // Add commands to the Application object
 $hydraCommands = array(
 	new Process($dic), 
 	new Shell($dic),
 	new Version($dic),
+	new Init($dic),
 );
-if(!$dic['insidePhar']) {
+if(!$dic['inside_phar']) {
 	$hydraCommands[] = new Compile($dic);
 }
 
 foreach ($hydraCommands as $c) {
-	$dic['hydraApp']->add($c);
+	$dic['hydra_app']->add($c);
 }
 
 //Run the Application
-$dic['hydraApp']->run();
+$dic['hydra_app']->run();
 

@@ -14,9 +14,9 @@ class Finder extends Pimple
 			return new SymfonyFinder();
 		});
 
-		$this['txtFiles'] = $this->share(function () use ($c) {
-			$txtDir = $c['workingDirectory'].'/'.$c['conf']['txtDir'].'/';
-			$extention = '*.'.$c['conf']['txtFileExtension'];
+		$this['txt_files'] = $this->share(function () use ($c) {
+			$txtDir = $c['working_directory'].'/'.$c['conf']['txt_dir'].'/';
+			$extention = '*.'.$c['conf']['txt_file_extension'];
 			$f = new SymfonyFinder();
 			$f->files()
 				->ignoreVCS(true)
