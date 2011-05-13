@@ -30,7 +30,7 @@ class Process extends SymfonyCommand
 	{
 		$this
 			->setName('hydra:process')
-			->setDefinition(array())
+			//->setDefinition(array())
 			->setDescription('Generate your website')
 			->setHelp(<<<EOF
 The <info>hydra:process</info> command generate your website !
@@ -42,18 +42,18 @@ EOF
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 
-		$output->writeln('<info>[info]</info> Started hydration of your text files');
+		$output->writeln($this->dic['conf']['command_prefix'].' Started hydration of your text files');
 
 		$files = $this->dic['finder']['txt_files'];
 
-		$output->writeln('<info>[info]</info> Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
+		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
 
 		foreach ($files as $file) {
 
 			// The name of the final html file is, by default, the name of the txt file
 			$wwwFile = reset(explode('.', end(explode('/',$file->getRealPath()))));
 
-			$output->writeln('<info>[info]</info> Processing file <comment>'.$wwwFile.' ('.$file.')</comment>');
+			$output->writeln($this->dic['conf']['command_prefix'].' Processing file <comment>'.$wwwFile.' ('.$file.')</comment>');
 
 			// Get rid of CR and spaces
 			$fileArray = file($file);
@@ -79,9 +79,9 @@ EOF
 			// Generate the html
 			if($output->getVerbosity()==2) {
 				foreach ($metaDatas as $k => $v) {
-					$output->writeln('  <info>[info]</info> ... with metadata <comment>'.$k.'</comment> => <comment>'.$v.'</comment>');
+					$output->writeln($this->dic['conf']['command_prefix'].'   ... with metadata <comment>'.$k.'</comment> => <comment>'.$v.'</comment>');
 				}
-				$output->writeln('  <info>[info]</info> ... and a content of <comment>'.strlen($content).'</comment> char(s) (<comment>'.str_word_count($content).'</comment> word(s))');
+				$output->writeln($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($content).'</comment> char(s) (<comment>'.str_word_count($content).'</comment> word(s))');
 			}
 
 			$html = $this->dic['twig']['parser']->render(
@@ -104,10 +104,10 @@ EOF
 				$html
 			);                                                     
 
-			$output->writeln('<info>[info]</info> Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $wwwFile).'</comment>');
+			$output->writeln($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $wwwFile).'</comment>');
 		}
 
-		$output->writeln('<info>[info]</info> Done.');
+		$output->writeln($this->dic['conf']['command_prefix'].' Done.');
 
 	}
 }

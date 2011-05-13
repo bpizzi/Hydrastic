@@ -46,12 +46,12 @@ EOF
 	{
 		$pharFile = $input->getArgument('pharfile');
 		if (file_exists($pharFile)) {
-			$output->writeln('<info>[info]</info> Deleting existing archive');
+			$output->writeln($this->dic['conf']['command_prefix'].' Deleting existing archive');
 			unlink($pharFile);
 		}
 
 
-		$output->writeln('<info>[info]</info> Creating archive : '.$pharFile);
+		$output->writeln($this->dic['conf']['command_prefix'].' Creating archive : '.$pharFile);
 		$phar = new \Phar($pharFile, 0, 'Hydra');
 		$phar->setSignatureAlgorithm(\Phar::SHA1);
 
@@ -74,7 +74,7 @@ EOF
 		foreach ($finder as $file) {
 			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file->getRealPath());
 			if($output->getVerbosity()==2) {
-				$output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+				$output->writeln($this->dic['conf']['command_prefix'].' Adding file to archive : '.$filepath);
 			}
 			$this->addFile($phar, $filepath);
 		}
@@ -89,7 +89,7 @@ EOF
 		foreach ($otherFiles as $file) {
 			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file);
 			if($output->getVerbosity()==2) {
-				$output->writeln('<info>[info]</info> Adding file to archive : '.$filepath);
+				$output->writeln($this->dic['conf']['command_prefix'].' Adding file to archive : '.$filepath);
 			}
 			$this->addFile($phar, $filepath);
 		}
@@ -104,7 +104,7 @@ EOF
 		}
 
 		unset($phar);
-		$output->writeln('<info>[info]</info> Done: compiled Hydra to hydra.phar');
+		$output->writeln($this->dic['conf']['command_prefix'].' Done: compiled Hydra to hydra.phar');
 	}
 
 	protected function addFile($phar, $file, $strip = true)
