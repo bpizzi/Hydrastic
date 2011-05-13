@@ -164,6 +164,12 @@ EOF
 			$output->writeln($this->dic['conf']['command_prefix'].' Configuration file writed to disc.');
 			$output->writeln($this->dic['conf']['command_prefix'].' You can begin to write your templates and text files and try <info>hydra:process</info> command to generate you static content!');
 
+			//Create an executable shortcut to hydra.phar under linux
+			if (PHP_OS == 'Linux') {
+				file_put_contents('hydra', "#!/bin/sh\nphp hydra.phar $1");
+				system('chmod +x hydra');
+				$output->writeln($this->dic['conf']['command_prefix'].' I created a shorcut for you : you can now run me with <info>./hydra</info>, assuming PHP binary is accessible from your ENV.');
+			}
 
 		} else {
 			$output->writeln($this->dic['conf']['command_prefix'].' I can see you already have a configuration file. Please delete it before running me again.');
