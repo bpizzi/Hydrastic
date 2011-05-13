@@ -30,7 +30,12 @@ if( $workingDir == '' ) {
 	$dic['working_directory'] = dirname(__DIR__);
 	$dic['hydra_dir'] = __DIR__;
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml'));
-	$userConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/../hydra-conf.yml')); 
+	$userConfFile = $dic['working_directory'].'/hydra-conf.yml';
+	if(file_exists($userConfFile)) {
+		$userConf = $dic['yaml']['parser']->parse(file_get_contents($userConfFile)); 
+	} else {
+		$userConf = array();
+	}
 } else {
 	//Currently inside a phar archive
 	$dic['inside_phar'] = true;
