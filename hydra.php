@@ -52,7 +52,7 @@ if( $workingDir == '' ) {
 	}
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
 }
-$dic['conf'] = ArrayMerger::Merge($defaultConf, $userConf);
+$dic['conf'] = ArrayMerger::mergeUniqueValuesRecursive($defaultConf, $userConf);
 
 // Register services
 $dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });

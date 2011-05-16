@@ -14,19 +14,33 @@ abstract class ArrayMerger
 	 * it will not be duplicated in the final array,
 	 * and the value of the second arrays is used.
 	 */
-	static public function Merge($Arr1, $Arr2)
+	static public function mergeUniqueValuesRecursive($arr1, $arr2)
 	{
-		foreach($Arr2 as $key => $Value)
-		{
-			if(array_key_exists($key, $Arr1) && is_array($Value)) {
-				$Arr1[$key] = self::Merge($Arr1[$key], $Arr2[$key]);
+		foreach ($arr2 as $key => $value) {
+			if(array_key_exists($key, $arr1) && is_array($value)) {
+				$arr1[$key] = self::mergeUniqueValuesRecursive($arr1[$key], $arr2[$key]);
 			} else {
 
-				$Arr1[$key] = $Value;
+				$arr1[$key] = $value;
 			}
 		}
-		return $Arr1;
+
+		return $arr1;
 	}
 
+	/**
+ 	 * Make $arr1 hold unique values from both $arr1 and $arr2
+	 *
+	 */
+	static public function mergeUniqueValues($arr1, $arr2)
+	{
+		foreach ($arr2 as $key => $value) {
+			if (false === in_array($value, $arr1)) {
+				$arr1[] = $value;
+			}
+		}
+
+		return $arr1;
+	}
 }
 
