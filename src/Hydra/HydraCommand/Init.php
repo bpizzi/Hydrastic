@@ -90,7 +90,7 @@ EOF
 					$folderConf[$response.'_dir'] = $d->getRelativePathname();
 				}
 				$output->writeln('---');
-				if(false === in_array(null,$folderConf)) {
+				if (false === in_array(null,$folderConf)) {
 					//If every folder conf key has been defined, quit the loop
 					break;
 				}
@@ -137,10 +137,10 @@ EOF
 					$confValid = true;
 				} else {
 					//Last chance update of a configuration key
-					if(array_key_exists($response, $folderConf)) {
+					if (array_key_exists($response, $folderConf)) {
 						$folderConf[$response] = $dialog->ask($output, "          New folder for holding <comment>".$folderConfDefinition[$k]["type"]."</comment>: ");
 					}
-					if(array_key_exists($response, $siteConf)) {
+					if (array_key_exists($response, $siteConf)) {
 						$siteConf[$response] = $dialog->ask($output, $this->dic['conf']['command_prefix']."New value for site configuration key <comment>".$response."</comment>: ");
 					}
 				}
@@ -151,7 +151,7 @@ EOF
 			$output->writeln('---');
 			foreach ($folderConf as $k => $folder) {
 				if (false === is_dir($this->dic['working_directory'].'/'.$folder)) {
-					if(false === @mkdir($folder)) {
+					if (false === @mkdir($folder)) {
 						$output->writeln('<error>[error]</error> Creation of the folder "'.$folder.'" failed.');
 					} else {
 						$output->writeln($this->dic['conf']['command_prefix'].' Folder created : <info>'.$folder.'/</info>');
@@ -170,7 +170,7 @@ EOF
 
 			//Create an executable shortcut to hydra.phar under linux
 			if (PHP_OS == 'Linux') {
-				file_put_contents('hydra', "#!/bin/sh\nphp hydra.phar $1");
+				file_put_contents('hydra', "#!/bin/sh\nphp hydra.phar $@");
 				system('chmod +x hydra');
 				$output->writeln($this->dic['conf']['command_prefix'].' I created a shorcut for you : you can now run me with <info>./hydra</info>, assuming PHP binary is accessible from your ENV.');
 			}
