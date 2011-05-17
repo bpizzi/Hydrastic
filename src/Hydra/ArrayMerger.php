@@ -14,11 +14,11 @@ abstract class ArrayMerger
 	 * it will not be duplicated in the final array,
 	 * and the value of the second arrays is used.
 	 */
-	static public function mergeUniqueValuesRecursive($arr1, $arr2)
+	static public function mergeUniqueKeysRecursive($arr1, $arr2)
 	{
 		foreach ($arr2 as $key => $value) {
 			if(array_key_exists($key, $arr1) && is_array($value)) {
-				$arr1[$key] = self::mergeUniqueValuesRecursive($arr1[$key], $arr2[$key]);
+				$arr1[$key] = self::mergeUniqueKeysRecursive($arr1[$key], $arr2[$key]);
 			} else {
 
 				$arr1[$key] = $value;
@@ -41,6 +41,11 @@ abstract class ArrayMerger
 		}
 
 		return $arr1;
+	}
+
+	static public function mergeDeepArray($arr1, $arr2)
+	{
+
 	}
 }
 
