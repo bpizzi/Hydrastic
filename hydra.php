@@ -3,7 +3,6 @@
 require_once __DIR__.'/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Hydra\ArrayMerger;
 use Hydra\HydraCommand\Process;
 use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
@@ -12,6 +11,7 @@ use Hydra\HydraCommand\Init;
 use Hydra\Service\Twig as TwigService;
 use Hydra\Service\Yaml as YamlService;
 use Hydra\Service\Finder as FinderService;
+use Hydra\Service\Util as UtilService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
@@ -20,6 +20,7 @@ $dic = new Pimple();
 
 // Register services that do not depends on config
 $dic['yaml']   = $dic->share(function ($c) { return new YamlService($c); });
+$dic['util'] = $dic->share(function ($c) { return new UtilService($c); });
 
 // Set the working directory correctly and read/set the conf 
 // depending on being in a phar archive or not.
@@ -52,7 +53,7 @@ if( $workingDir == '' ) {
 	}
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
 }
-$dic['conf'] = ArrayMerger::mergeUniqueKeysRecursive($defaultConf, $userConf);
+$dic['conf'] = $dic['util']['array.merger']->mergeUniqueKeysRecursive($defaultConf, $userConf);
 
 // Register services
 $dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });

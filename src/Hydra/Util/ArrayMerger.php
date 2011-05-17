@@ -1,11 +1,11 @@
 <?php
 
-namespace Hydra;
+namespace Hydra\Util;
 
 /**
  * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
  */
-abstract class ArrayMerger 
+class ArrayMerger 
 {
 
 	/**
@@ -14,7 +14,7 @@ abstract class ArrayMerger
 	 * it will not be duplicated in the final array,
 	 * and the value of the second arrays is used.
 	 */
-	static public function mergeUniqueKeysRecursive($arr1, $arr2)
+	public function mergeUniqueKeysRecursive($arr1, $arr2)
 	{
 		foreach ($arr2 as $key => $value) {
 			if(array_key_exists($key, $arr1) && is_array($value)) {
@@ -32,7 +32,7 @@ abstract class ArrayMerger
  	 * Make $arr1 hold unique values from both $arr1 and $arr2
 	 *
 	 */
-	static public function mergeUniqueValues($arr1, $arr2)
+	public function mergeUniqueValues($arr1, $arr2)
 	{
 		foreach ($arr2 as $key => $value) {
 			if (false === in_array($value, $arr1)) {
@@ -43,9 +43,5 @@ abstract class ArrayMerger
 		return $arr1;
 	}
 
-	static public function mergeDeepArray($arr1, $arr2)
-	{
-
-	}
 }
 
