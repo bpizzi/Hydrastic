@@ -160,9 +160,9 @@ EOF
 					$output->writeln($this->dic['conf']['command_prefix'].' Folder already exists : <info>'.$folder.'/</info>');
 				}
 			}
-			$masterConfig = array_merge_recursive($folderConf, array('metadata_defaults' => $siteConf));
+			$masterConfig = array_merge_recursive($folderConf, array('metadata_defaults' => array('General' => $siteConf)));
 			$dumper = $this->dic['yaml']['dumper'];
-			file_put_contents('hydra-conf.yml',$dumper->dump($masterConfig));
+			file_put_contents('hydra-conf.yml',$dumper->dump($masterConfig, 3));
 
 			//Done ! :)
 			$output->writeln($this->dic['conf']['command_prefix'].' Configuration file writed to disc.');

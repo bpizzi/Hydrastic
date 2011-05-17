@@ -3,6 +3,7 @@ namespace Hydra\HydraCommand;
 
 use Hydra\ArrayMerger;
 use Hydra\Post;
+use Hydra\Taxonomy;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,8 +52,7 @@ EOF
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
 
-		$categories = array();
-		$tags = array();
+		$taxonomy = new Taxonomy($this->dic, $output);
 
 		foreach ($files as $file) {
 			$output->writeln('----->');
@@ -66,9 +66,7 @@ EOF
 				->hydrate()
 				->writeToFile();
 
-			$taxonomy = $post->getTaxonomy();
-
-			//TODO : handle taxonomy input here
+			$taxonomy->addTaxa($post->getTaxonomy());
 
 		} //-- parsing content files
 

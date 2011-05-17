@@ -6,7 +6,8 @@ www_dir: www
 www_file_extension: html
 txt_file_extension: txt
 metadata_defaults:
-  template: post
-  title: Please override me !
-  description: Please override me !
-  author: Please override me !
+  General: 
+    template: post
+    title: Please override me !
+    description: Please override me !
+    author: Please override me !

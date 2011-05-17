@@ -4,6 +4,7 @@ namespace Hydra;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Hydra\Taxonomy;
 use Hydra\ArrayMerger;
 
 /**
@@ -49,6 +50,20 @@ class Post
 	}
 
 	/**
+	 * Set the taxonomy of the post from taxonomy field found in metadatas
+	 *
+	 * @param array $taxonomy An array of taxonomy [two-levels array('taxon1' => array('class1', 'class2', 'class3'), 'taxon2' => array(...), ...)]
+	 */
+	public function setTaxonomy($taxonomy) {
+		if(is_array($taxonomy)) {
+			$this->taxonomy = $taxonomy;
+		} else {
+			throw \Exception();
+		}
+
+	}
+
+	/**
 	 * Set the filepath of the original content
 	 *
 	 * @param $filepath A full filepath to a text file
@@ -87,7 +102,7 @@ class Post
 	{
 		$this->fileArray = file($this->filepath);
 		array_walk($this->fileArray, function(&$item, $key) {
-			$item = trim($item);
+			$item = str_replace("\n", '', $item);
 		});                                     
 
 		return $this;
@@ -101,31 +116,26 @@ class Post
 	public function parseMetas()
 	{
 		// Get the metadatas
-		$metaDatasStr =  implode("\n", array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
+		$metaDatasStr =  implode(chr(13), array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
 
 		// Parse the metadatas in a array, using defaults when necessary
 		$this->metaDatas = $this->dic['yaml']['parser']->parse($metaDatasStr);
-		array_walk($this->metaDatas, function(&$item, $key, $hydraConf) {
+		array_walk($this->metaDatas['General'], function(&$item, $key, $hydraConf) {
 			if ($item == "") {
-				$item = $hydraConf['metadata_defaults'][$key];
+				$item = $hydraConf['metadata_defaults']['General'][$key];
 			}
 		}, $this->dic['conf']);
 
-		//check if there is some taxonomy in metadata and add it to the taxonomy of the post if necessary
-		//TODO
-		//if (isset($metaDatas["categories"]) && sizeof($metaDatas["categories"]>0)) {
-		//$categories = ArrayMerger::mergeUniqueValues($categories, $metaDatas["categories"]);
-		//}
-		//if (isset($metaDatas["tags"]) && sizeof($metaDatas["tags"]>0)) {
-		//$tags = ArrayMerger::mergeUniqueValues($tags, $metaDatas["tags"]);
-		//}
+		if (isset($this->metaDatas['Taxonomy']) && sizeof($this->metaDatas['Taxonomy'])>0) {
+        	$this->setTaxonomy($this->metaDatas['Taxonomy']);
+		}
 
 		//Setting name+ extension of the file to write
-		if (isset($this->metaDatas['filename']) && $this->metaDatas['filename'] != "") {
-			$this->finalWwwFilename = $this->metaDatas['filename'];
+		if (isset($this->metaDatas['General']['filename']) && $this->metaDatas['General']['filename'] != "") {
+			$this->finalWwwFilename = $this->metaDatas['General']['filename'];
 		}
-		if (isset($this->metaDatas['file_extension']) && $this->metaDatas['file_extension'] != "") {
-			$this->finalWwwFilename .= '.'.$this->metaDatas['file_extension'];
+		if (isset($this->metaDatas['General']['file_extension']) && $this->metaDatas['General']['file_extension'] != "") {
+			$this->finalWwwFilename .= '.'.$this->metaDatas['General']['file_extension'];
 		} else {
 			$this->finalWwwFilename .= '.'.$this->dic['conf']['www_file_extension'];
 		}
@@ -154,7 +164,7 @@ class Post
 	public function hydrate()
 	{
 		if ($this->output->getVerbosity()==2) {
-			foreach ($this->metaDatas as $k => $v) {
+			foreach ($this->metaDatas['General'] as $k => $v) {
 				if (is_array($v)) {
 					$options = '{';
 					foreach ($v as $v2) {
@@ -169,8 +179,8 @@ class Post
 			$this->output->writeln($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
 		}
 		$this->html = $this->dic['twig']['parser']->render(
-			$this->metaDatas['template'].'.twig',
-			array_merge($this->metaDatas, array("content" => $this->content))
+			$this->metaDatas['General']['template'].'.twig',
+			array_merge($this->metaDatas['General'], array("content" => $this->content))
 		); 
 
 		return $this;
