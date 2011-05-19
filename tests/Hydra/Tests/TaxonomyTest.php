@@ -16,12 +16,12 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->fixDir = __DIR__.'/../fixtures/';
 
 		$this->dic = new Pimple();
-		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['yaml'] = $this->dic->share(function ($c) { return new YamlService($c); });
 		$this->dic['finder'] = $this->dic->share(function ($c) { return new FinderService($c); });
+		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 	}
 
-	public function testInitiateTaxonomy()
+	public function testParsingCorrectlyYamlTaxonomyFile()
 	{
 		$expected = array(
 			"Taxonomy" => array(
@@ -45,16 +45,27 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 *
-	 * @depends testInitiateTaxonomy
 	 */
-	public function testAddPostToTaxonomy()
+	public function testTaxonomyInitiateCorrectlyItsTaxonStorage()
 	{
 
 		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydra-conf-1.yml')); 
-		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
+		$this->dic['taxonomy']->initiateTaxonStorage();
 
-		$post = new Post($this->dic);
-		$post->read($file);
+		//var_dump($this->dic['taxonomy']->getTaxonStorage());
+		//$this->assertTrue($this->dic['taxonomy']->getTaxonStorage()->contains())
+
+	}
+
+	public function testReadingPostUpdateCorrectlyGlobalTaxonomy()
+	{
+		//$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
+
+		//$post = new Post($this->dic);
+		//$post->read($file)->clean()->parseMetas()->updateGlobalTaxonomy($this->dic);
+
+
+
 
 	}
 

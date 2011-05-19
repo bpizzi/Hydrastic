@@ -36,7 +36,7 @@ class Post
 	/**
 	 * Constructs the Post object
 	 *
- 	 * @param array $dic The Application's Dependency Injection Container
+	 * @param array $dic The Application's Dependency Injection Container
 	 * @param OutputInterface $output Where to log actions
 	 */
 	public function __construct($dic)
@@ -85,8 +85,30 @@ class Post
 		} else {
 			throw \Exception();
 		}
-
 	}
+
+/* $expected = array(
+		"Taxonomy" => array(
+			"Cat" => array(
+				"Cat1" => array(
+					"Subcat1" => array(
+						"Elem1Subcat1",
+					   	"Elem2Subcat1"),
+				),
+				"Cat2" => array("ElemCat2"),
+			),
+			"Tag" => array(
+				"Tag1",
+				"Tag2",
+				"Subtag1" => array(
+					"Elem1Subtag1", 
+				),
+				"Subtag2" => array(
+					"Elem1Subtag2",
+			   	),
+			)
+		)
+); */
 
 	/**
 	 * Set the filepath of the original content
@@ -117,9 +139,8 @@ class Post
 		return $this;
 	}
 
-
 	/**
- 	 * Parse a file into an array where each value is a line
+	 * Parse a file into an array where each value is a line
 	 * Get read of CR and spaces for each lines
 	 * And proceed to further actions
 	 */
@@ -152,7 +173,7 @@ class Post
 		}, $this->dic['conf']);
 
 		if (isset($this->metaDatas['Taxonomy']) && sizeof($this->metaDatas['Taxonomy'])>0) {
-        	$this->setTaxonomy($this->metaDatas['Taxonomy']);
+			$this->setTaxonomy($this->metaDatas['Taxonomy']);
 		}
 
 		//Setting name+ extension of the file to write
@@ -172,7 +193,7 @@ class Post
 	}
 
 	/**
- 	 * Extract the content of $fileArray
+	 * Extract the content of $fileArray
 	 * Must be called after clean()
 	 * And proceed to further actions
 	 */
@@ -185,7 +206,7 @@ class Post
 	}
 
 	/**
- 	 * Hydrate a template with $content, respect $metaData and $dic['conf'] when needed
+	 * Hydrate a template with $content, respect $metaData and $dic['conf'] when needed
 	 * Must be called after parseContent() and parseMetas()
 	 * And proceed to further actions
 	 */

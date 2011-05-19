@@ -3,6 +3,7 @@
 namespace Hydra;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use \SplObjectStorage;
 
 /**
  * Taxonomy is classification.
@@ -35,40 +36,7 @@ class Taxonomy
 	protected $dic = array(); //The Dependency Injection Container
 	protected $output;
 
-	protected $taxa = array(); //Hold all the taxa with their children
-
-	protected $taxons = array(); //Hold taxon objects
-	protected $posts = array(); //Hold post objects
-
-	public function getTaxons()
-	{
-
-	}
-
-	public function getTaxon($taxonSlug) 
-	{
-
-	}
-
-	public function getPosts()
-	{
-
-	}
-
-	public function getPost($postSlug)
-	{
-
-	}
-
-	public function getTaxa()
-	{
-		return $this->taxa;
-	}
-
-	public function setTaxa($taxa) 
-	{
-		$this->taxa = $taxa;
-	}
+	protected $taxonStorage = array(); //Hold taxon objects
 
 
 	/**
@@ -80,17 +48,69 @@ class Taxonomy
 	public function __construct($dic)
 	{
 		$this->dic = $dic;
-
-		$this->initiateTaxonomy();
+		$this->setTaxonStorage(new SplObjectStorage());
 	}
 
-	public function initiateTaxonomy() {
-		
-		$this->setTaxa($this->dic['conf']['Taxonomy']);
+	public function getTaxonStorage()
+	{
+		return $this->taxonStorage;
 	}
 
-	public function addPost($post) {
+	public function setTaxonStorage($taxonStorage)
+	{
+		$this->taxonStorage = $taxonStorage;
+	}
 
+	public function addTaxon($taxon)
+ 	{
+		$this->taxonStorage->attach($taxon, $taxon->getName());
+	}
+
+	public function initiateTaxonStorage() 
+	{
+		foreach ($this->dic['conf']['Taxonomy'] as $parentName => $child) {
+			//echo "New parent : $parentName, level 0\n";
+			$parent = new Taxon();
+			$parent->setName($parentName);
+			$parent->setLevel(0); 
+
+			if(is_array($child)) {
+				//If the taxon as children
+				//echo "Going into deep init for ".sizeof($child)." children of : $parentName\n";
+				$this->deepTaxonInit($child, $parent, 0); 
+			} else {
+				//echo "New child : $child, level 1\n";
+				$child = new Taxon();
+				$child->setName($child);
+				$child->setLevel(1);
+				$parent->addChild($child);
+			}
+		}
+		$this->addTaxon($parent, $parent->getName());
+	}
+
+	public function deepTaxonInit($children, &$parent, $level)
+	{
+		$level++;
+		foreach ($children as $childName => $grandChildName) {
+			//echo "New parent : $childName, level $level\n";
+			$subParent = new Taxon();
+			$subParent->setName($childName);
+			$subParent->setLevel($level);
+			$parent->addChild($subParent);
+
+			if (is_array($grandChildName)) {
+				//echo "Going into deep init for ".sizeof($grandChildName)." children of : $childName\n";
+				$this->deepTaxonInit($grandChildName, $subParent, $level); //recursivity's magic
+			} else {
+				$grandChildLevel = $level + 1;
+				//echo "New child : $grandChildName, level $grandChildLevel\n";
+				$grandChild = new Taxon();
+				$grandChild->setName($grandChildName);
+				$grandChild->setLevel($grandChildLevel);
+				$subParent->addChild($grandChild);
+			}
+		}
 	}
 
 	/**

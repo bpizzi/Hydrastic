@@ -10,3 +10,19 @@ metadata_defaults:
   title: Hydra 
   description: Hydra is a static website generator
   author: Baptiste Pizzighini
+Taxonomy:
+    Cat:
+        Cat1:
+            Subcat1:
+                - Elem1Subcat1
+                - Elem2Subcat1
+        Cat2:
+            - ElemCat2
+    Tag:
+        - Tag1
+        - Tag2
+        Subtag1:
+            - Elem1Subtag1
+        Subtag2:
+            - Elem1Subtag2
+
