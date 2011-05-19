@@ -125,6 +125,7 @@ class ArrayMergerTest extends PHPUnit_Framework_TestCase
 		$a2 = array("Banana");
 		$r = array(1, 2, "Banana");
 		$this->assertEquals($am->mergeUniqueValues($a1,$a2), $r);
+
 	}
 
 }

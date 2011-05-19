@@ -3,6 +3,7 @@
 require_once __DIR__.'/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Hydra\Taxonomy;
 use Hydra\HydraCommand\Process;
 use Hydra\HydraCommand\Compile;
 use Hydra\HydraCommand\Shell;
@@ -54,6 +55,9 @@ if( $workingDir == '' ) {
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
 }
 $dic['conf'] = $dic['util']['array.merger']->mergeUniqueKeysRecursive($defaultConf, $userConf);
+
+// Register Taxonomy
+$dic['taxonomy'] = $dic->share(function ($c) { return new Taxonomy($c); });
 
 // Register services
 $dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });

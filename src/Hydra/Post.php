@@ -25,9 +25,13 @@ class Post
 
 	protected $finalWwwFile;
 
+	protected $slug;
+
 	protected $metaDatas = array();
 
 	protected $taxonomy = array();
+
+	protected $output = null;
 
 	/**
 	 * Constructs the Post object
@@ -35,15 +39,36 @@ class Post
  	 * @param array $dic The Application's Dependency Injection Container
 	 * @param OutputInterface $output Where to log actions
 	 */
-	public function __construct($dic, OutputInterface $output)
+	public function __construct($dic)
 	{
 		$this->dic = $dic;
-		$this->output = $output;
+		if(array_key_exists('output', $dic)) {
+			$this->output = $dic['output'];
+		}
 	}
 
-	/**
-	 * Returns the taxonomy of the post
-	 */
+
+	public function writeOutput($msg) {
+		if (false === is_null($this->output)) {
+			$this->output->writeln($msg);
+		}
+	}
+
+	public function getSlug()
+	{
+		return $this->slug;
+	}
+
+	public function setSlug($slug)
+	{
+		$this->slug = $slug;
+	}
+
+	public function getFinalWwwFile() 
+	{
+		return $this->finalWwwFilename;
+	}
+
 	public function getTaxonomy() 
 	{
 		return $this->taxonomy;
@@ -55,7 +80,7 @@ class Post
 	 * @param array $taxonomy An array of taxonomy [two-levels array('taxon1' => array('class1', 'class2', 'class3'), 'taxon2' => array(...), ...)]
 	 */
 	public function setTaxonomy($taxonomy) {
-		if(is_array($taxonomy)) {
+		if (is_array($taxonomy)) {
 			$this->taxonomy = $taxonomy;
 		} else {
 			throw \Exception();
@@ -84,7 +109,7 @@ class Post
 		if (file_exists($file)) {
 			$this->setFilepath($file);
 			$this->wwwFile = reset(explode('.', end(explode('/',$file->getRealPath()))));
-			$this->output->writeln($this->dic['conf']['command_prefix'].' Processing file <comment>'.$this->wwwFile.' ('.$file.')</comment>');
+			$this->writeOutput($this->dic['conf']['command_prefix'].' Processing file <comment>'.$this->wwwFile.' ('.$file.')</comment>');
 		} else {
 			throw new \Exception();
 		}
@@ -131,13 +156,16 @@ class Post
 		}
 
 		//Setting name+ extension of the file to write
-		if (isset($this->metaDatas['General']['filename']) && $this->metaDatas['General']['filename'] != "") {
-			$this->finalWwwFilename = $this->metaDatas['General']['filename'];
-		}
-		if (isset($this->metaDatas['General']['file_extension']) && $this->metaDatas['General']['file_extension'] != "") {
-			$this->finalWwwFilename .= '.'.$this->metaDatas['General']['file_extension'];
+		if (isset($this->metaDatas['General']['slug']) && $this->metaDatas['General']['slug'] != "") {
+			$this->setSlug($this->metaDatas['General']['slug']);
 		} else {
-			$this->finalWwwFilename .= '.'.$this->dic['conf']['www_file_extension'];
+			$this->setSlug($this->dic['util']['slugify']->slugify($this->metaDatas['General']['title']));
+		}
+
+		if (isset($this->metaDatas['General']['file_extension']) && $this->metaDatas['General']['file_extension'] != "") {
+			$this->finalWwwFilename = $this->getSlug() . '.' . $this->metaDatas['General']['file_extension'];
+		} else {
+			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['www_file_extension'];
 		}
 
 		return $this;
@@ -171,12 +199,12 @@ class Post
 						$options .= $v2.', ';
 					}
 					$options = substr($options, 0, strlen($options)-2).'}';
-					$this->output->writeln($this->dic['conf']['command_prefix'].'   ... with metadata <comment>'.$k.'</comment> => <comment>'.$options.'</comment>');
+					$this->writeOutput($this->dic['conf']['command_prefix'].'   ... with metadata <comment>'.$k.'</comment> => <comment>'.$options.'</comment>');
 				} else {
-					$this->output->writeln($this->dic['conf']['command_prefix'].'   ... with metadata <comment>'.$k.'</comment> => <comment>'.$v.'</comment>');
+					$this->writeOutput($this->dic['conf']['command_prefix'].'   ... with metadata <comment>'.$k.'</comment> => <comment>'.$v.'</comment>');
 				}
 			}
-			$this->output->writeln($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
+			$this->writeOutput($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
 		}
 		$this->html = $this->dic['twig']['parser']->render(
 			$this->metaDatas['General']['template'].'.twig',
@@ -199,10 +227,10 @@ class Post
 		// Write the html
 		file_put_contents($fileToWrite, $this->html);
 		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->html) {
-			$this->output->writeln($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');
+			$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');
 			return true;
 		}
-		$this->output->writeln($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrating <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');
+		$this->writeOutput($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrating <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');
 		return false;
 	}
 

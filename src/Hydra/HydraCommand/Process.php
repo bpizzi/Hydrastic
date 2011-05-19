@@ -46,33 +46,32 @@ EOF
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 
+		$dic['output'] = $output;
+
 		$output->writeln($this->dic['conf']['command_prefix'].' Started hydration of your text files');
 
 		$files = $this->dic['finder']['txt_files'];
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
 
-		$taxonomy = new Taxonomy($this->dic, $output);
+		$taxonomy = $this->dic['taxonomy'];
 
 		foreach ($files as $file) {
 			$output->writeln('----->');
 
-			$post = new Post($this->dic, $output);
+			$post = new Post($this->dic);
 
 			$post->read($file)
 				->clean()
 				->parseMetas()
+				->setTaxa()
 				->parseContent()
 				->hydrate()
 				->writeToFile();
 
-			$taxonomy->addTaxa($post->getTaxonomy());
-
 		} //-- parsing content files
 
 		$output->writeln('----->');
-
-		//TODO : handle taxonomy output here
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Done.');
 

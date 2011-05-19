@@ -18,7 +18,7 @@ class ArrayMerger
 	{
 		foreach ($arr2 as $key => $value) {
 			if(array_key_exists($key, $arr1) && is_array($value)) {
-				$arr1[$key] = self::mergeUniqueKeysRecursive($arr1[$key], $arr2[$key]);
+				$arr1[$key] = $this->mergeUniqueKeysRecursive($arr1[$key], $arr2[$key]);
 			} else {
 
 				$arr1[$key] = $value;
