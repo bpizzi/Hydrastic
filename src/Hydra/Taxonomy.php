@@ -1,4 +1,13 @@
 <?php
+ /**
+ * This file is part of the Hydra package.
+ *
+ * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
 
 namespace Hydra;
 
@@ -32,9 +41,6 @@ use \SplObjectStorage;
  * but $this->dic['conf']['Taxonomy'] must have been read before.
  *
  * Posts can tell which taxa they are affected to in their metadatas.
- *
- *
- * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
  */
 class Taxonomy 
 {
@@ -72,6 +78,10 @@ class Taxonomy
 		$this->taxonStorage->attach($taxon, $taxon->getName());
 	}
 
+	/**
+	 * Go threw the taxonomy array (stored in the DIC), and initiate a tree of Taxon objects.
+	 * This function is recursive, and should be called the first time without args.
+	 */
 	public function initiateTaxonStorage($children = null, &$parent = null, $level = -1) 
 	{
 		$level ++;
@@ -111,6 +121,13 @@ class Taxonomy
 		}
 	}
 
+	/**
+	 * Search recursively threw the Taxon tree stored in $this->taxonStorage for a taxon with name === $taxonName.
+	 * If found, returns the Taxon object.
+	 * If not, returns false
+	 *
+	 * @param string taxonName The taxon name to search
+	 */
 	public function retrieveTaxonFromName($taxonName, $taxonStorage = null, $level = 0) 
 	{
 		if(is_null($taxonStorage)) {
@@ -143,10 +160,6 @@ class Taxonomy
 		}
 	}
 
-	/**
-	 * Retrieve taxa's templates, generate the HTML and store it
-	 *
-	 */
 	public function hydrateTaxa() {
 
 	}

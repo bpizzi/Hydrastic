@@ -1,4 +1,14 @@
 <?php 
+/**
+ * This file is part of the Hydra package.
+ *
+ * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
+
 namespace Hydra\HydraCommand;
 
 use Hydra\ArrayMerger;
@@ -13,10 +23,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 use Symfony\Component\Finder\Finder as SymfonyFinder;
 
-/**
- *
- * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
- */
 class Process extends SymfonyCommand
 {
 	protected $dic = array();

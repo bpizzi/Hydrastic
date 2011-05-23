@@ -13,4 +13,3 @@ $loader->registerPrefixes(array(
     'Pimple' => __DIR__.'/vendor/pimple/lib',
 ));
 $loader->register();
-

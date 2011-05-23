@@ -1,4 +1,14 @@
 <?php
+/**
+ * This file is part of the Hydra package.
+ *
+ * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
+
 
 require_once __DIR__.'/autoload.php';
 
@@ -83,4 +93,3 @@ foreach ($hydraCommands as $c) {
 
 //Run the Application
 $dic['hydra_app']->run();
-

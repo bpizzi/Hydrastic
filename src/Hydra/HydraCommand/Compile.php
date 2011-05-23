@@ -1,4 +1,14 @@
 <?php 
+/**
+ * This file is part of the Hydra package.
+ *
+ * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
+
 namespace Hydra\HydraCommand;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -9,9 +19,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Finder\Finder;
 
 
-/**
- * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
- */
 class Compile extends SymfonyCommand
 {
 
@@ -144,4 +151,3 @@ EOF
 	}
 
 }
-
