@@ -73,7 +73,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	}
 
-	public function testPostIsCorrectlyAttachedToGlobalTaxonomy()
+	public function testMutualAttachBetweenTaxonAndPost()
 	{
 		$this->dic['taxonomy']->initiateTaxonStorage();
 		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
@@ -93,6 +93,9 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		//Testing $taxon->hasPost()
 		$this->assertTrue($taxonThatShouldBeAttached->hasPost($post), "Taxon 'Elem1Subcat1' knows the post");
 		$this->assertFalse($existingTaxonThatShouldNotBeAttached->hasPost($post), "Taxon 'Elem2Subcat1' don't know the post");
+
+		$freshTaxon = $this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subcat1");
+		$this->assertTrue($freshTaxon->hasPost($post), "Freshly retrieved Taxon 'Elem1Subcat1' is attached to its post");
 
 	}
 
