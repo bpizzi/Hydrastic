@@ -58,6 +58,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Cat"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Cat')");
 		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subtag2"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subtag2')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Subtag1"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Subtag1')");
 
 	}
 

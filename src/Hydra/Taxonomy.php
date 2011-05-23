@@ -101,7 +101,11 @@ class Taxonomy
 		foreach ($children as $childName => $grandChildName) {
 			//echo "New parent : $childName, level $level\n";
 			$subParent = new Taxon();
-			$subParent->setName($childName);
+			if (is_int($childName)) {
+				$subParent->setName(null);
+			} else {
+				$subParent->setName($childName);
+			}
 			$subParent->setLevel($level);
 			$parent->addChild($subParent);
 
@@ -129,7 +133,7 @@ class Taxonomy
 
 		while($taxonStorage->valid()) {
 			$taxon = $taxonStorage->current();
-			//echo $taxon->getName()." at level ".$taxon->getLevel()." TEST -".$taxon->getName()."- === -".$taxonName."- \n";
+			//echo $taxon->getName()." at level ".$taxon->getLevel()." - \n";
 			if ($taxon->getName() === $taxonName) {
 				//echo "FOUND\n";
 				return $taxon;
@@ -139,7 +143,7 @@ class Taxonomy
 				$levelUp = $level + 1;
 				$deepSearch = $this->retrieveTaxonFromName($taxonName, $taxon->getChildren(), $levelUp);
 				if (is_a($deepSearch, "Hydra\Taxon")) {
-                  return $deepSearch;
+					return $deepSearch;
 				}
 			}
 			$taxonStorage->next();
