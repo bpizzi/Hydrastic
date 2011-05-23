@@ -52,7 +52,7 @@ class Post
 	public function __construct($dic)
 	{
 		$this->dic = $dic;
-		if(array_key_exists('output', $dic)) {
+		if(isset($dic["output"])) {
 			$this->output = $dic['output'];
 		}
 		$this->setTaxonStorage(new SplObjectStorage());

@@ -52,7 +52,7 @@ EOF
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 
-		$dic['output'] = $output;
+		$this->dic['output'] = $output;
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Started hydration of your text files');
 
@@ -70,7 +70,6 @@ EOF
 			$post->read($file)
 				->clean()
 				->parseMetas()
-				->setTaxa()
 				->parseContent()
 				->hydrate()
 				->attachToTaxonomy();
