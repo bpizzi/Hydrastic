@@ -4,9 +4,10 @@ General:
   metakeys: Keys
   template: post
 Taxonomy: 
-  Cat1:
-    Subcat1:
-      - Elem1Subcat1
+  Cat:
+    Cat1:
+      Subcat1:
+        - Elem1Subcat1
   Tag:
     - Tag2
 ---

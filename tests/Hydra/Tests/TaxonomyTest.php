@@ -14,6 +14,7 @@ use Hydra\Taxonomy;
 use Hydra\Post;
 use Hydra\Service\Yaml as YamlService;
 use Hydra\Service\Finder as FinderService;
+use Hydra\Service\Util as UtilService;
 
 class TaxonomyTest extends PHPUnit_Framework_TestCase
 {
@@ -23,12 +24,16 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function setUp() {
 
-		$this->fixDir = __DIR__.'/../fixtures/';
+		$this->fixDir = __DIR__.'/../fixtures/set1/';
 
 		$this->dic = new Pimple();
 		$this->dic['yaml'] = $this->dic->share(function ($c) { return new YamlService($c); });
 		$this->dic['finder'] = $this->dic->share(function ($c) { return new FinderService($c); });
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
+		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
+
+		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydra-conf-1.yml')); 
+
 	}
 
 	public function testParsingCorrectlyYamlTaxonomyFile()
@@ -53,34 +58,41 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $result, "Correctly parsing taxonomy from hydra-conf");
 	}
 
-	/**
-	 *
-	 */
 	public function testTaxonomyInitiateCorrectlyItsTaxonStorage()
 	{
-
-		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydra-conf-1.yml')); 
+		$this->assertFalse($this->dic['taxonomy']->isInitiated(), "isInitiated returns false before initiateTaxonStorage()");
 		$this->dic['taxonomy']->initiateTaxonStorage();
-
-		//var_dump($this->dic['taxonomy']->getTaxonStorage());
+		$this->assertTrue($this->dic['taxonomy']->isInitiated(), "isInitiated returns true after initiateTaxonStorage()");
 
 		$this->assertFalse($this->dic['taxonomy']->retrieveTaxonFromName("The Unknown Taxon"), "An unknown taxon shouldn't be found by retrieveTaxonFromName()");
 
 		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Cat"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Cat')");
 		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subtag2"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subtag2')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subcat1"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subcat1')");
 		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Subtag1"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Subtag1')");
 
 	}
 
-	public function testReadingPostUpdateCorrectlyGlobalTaxonomy()
+	public function testPostIsCorrectlyAttachedToGlobalTaxonomy()
 	{
-		//$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
+		$this->dic['taxonomy']->initiateTaxonStorage();
+		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
 
-		//$post = new Post($this->dic);
-		//$post->read($file)->clean()->parseMetas()->updateGlobalTaxonomy($this->dic);
+		$post = new Post($this->dic);
+		$post->read($file)->clean()->parseMetas()->attachToTaxonomy();
 
+		$taxonThatShouldBeAttached = $this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subcat1");
+		$notExistingTaxonThatShouldNotBeAttached = $this->dic['taxonomy']->retrieveTaxonFromName("Unknown");
+		$existingTaxonThatShouldNotBeAttached = $this->dic['taxonomy']->retrieveTaxonFromName("Elem2Subcat1");
 
+		//Testing $post->hasTaxon()
+		$this->assertTrue($post->hasTaxon($taxonThatShouldBeAttached), "Taxon Elem1Subcat1 is attached to its post");
+		$this->assertFalse($post->hasTaxon($notExistingTaxonThatShouldNotBeAttached), "An unknown taxon isn't attached to the post");
+		$this->assertFalse($post->hasTaxon($existingTaxonThatShouldNotBeAttached), "Taxon Elem2Subcat1 taxon isn't attached to the post");
 
+		//Testing $taxon->hasPost()
+		$this->assertTrue($taxonThatShouldBeAttached->hasPost($post), "Taxon 'Elem1Subcat1' knows the post");
+		$this->assertFalse($existingTaxonThatShouldNotBeAttached->hasPost($post), "Taxon 'Elem2Subcat1' don't know the post");
 
 	}
 

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Hydra\Taxonomy;
 use Hydra\ArrayMerger;
 
+use \SplObjectStorage;
+
 class Post 
 {
 
@@ -33,11 +35,13 @@ class Post
 
 	protected $slug;
 
-	protected $metaDatas = array();
+	protected $metadatas = array();
 
 	protected $taxonomy = array();
 
 	protected $output = null;
+
+	protected $taxonStorage;
 
 	/**
 	 * Constructs the Post object
@@ -51,8 +55,39 @@ class Post
 		if(array_key_exists('output', $dic)) {
 			$this->output = $dic['output'];
 		}
+		$this->setTaxonStorage(new SplObjectStorage());
 	}
 
+	public function __toString()
+	{
+		$ret = $this->getMetaDatas['General']['title'];
+		return is_string($ret) ? $ret : "";
+	}
+
+	public function setTaxonStorage($taxonStorage)
+	{
+		$this->taxonStorage = $taxonStorage;
+	}
+
+	public function getTaxonStorage()
+	{
+		return $this->taxonStorage;
+	}
+
+	public function getFilepath()
+	{
+		return $this->filepath;
+	}
+
+	public function getMetadatas()
+	{
+		return $this->metadatas;
+	}
+
+	public function setMetadatas($metadatas)
+	{
+		$this->metadatas = $metadatas;
+	}
 
 	public function writeOutput($msg) {
 		if (false === is_null($this->output)) {
@@ -93,29 +128,6 @@ class Post
 		}
 	}
 
-/* $expected = array(
-		"Taxonomy" => array(
-			"Cat" => array(
-				"Cat1" => array(
-					"Subcat1" => array(
-						"Elem1Subcat1",
-					   	"Elem2Subcat1"),
-				),
-				"Cat2" => array("ElemCat2"),
-			),
-			"Tag" => array(
-				"Tag1",
-				"Tag2",
-				"Subtag1" => array(
-					"Elem1Subtag1", 
-				),
-				"Subtag2" => array(
-					"Elem1Subtag2",
-			   	),
-			)
-		)
-); */
-
 	/**
 	 * Set the filepath of the original content
 	 *
@@ -124,6 +136,22 @@ class Post
 	public function setFilepath($filepath)
 	{
 		$this->filepath = $filepath;
+	}
+
+	public function hasTaxon($taxon)
+	{
+		if (true === is_a($taxon, "Hydra\Taxon")) {
+			return $this->getTaxonStorage()->contains($taxon) ? true : false;
+		} 
+		return false;
+	}
+
+	public function addTaxon($taxon)
+	{
+		if (false === is_a($taxon, "Hydra\Taxon")) {
+			throw new \Exception("addTaxon except a Hydra\Taxon object as a first argument");
+		}
+		$this->getTaxonStorage()->attach($taxon);
 	}
 
 	/**
@@ -171,26 +199,27 @@ class Post
 		$metaDatasStr =  implode(chr(13), array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
 
 		// Parse the metadatas in a array, using defaults when necessary
-		$this->metaDatas = $this->dic['yaml']['parser']->parse($metaDatasStr);
-		array_walk($this->metaDatas['General'], function(&$item, $key, $hydraConf) {
+		$this->setMetadatas($this->dic['yaml']['parser']->parse($metaDatasStr));
+
+		array_walk($this->metadatas['General'], function(&$item, $key, $hydraConf) {
 			if ($item == "") {
 				$item = $hydraConf['metadata_defaults']['General'][$key];
 			}
 		}, $this->dic['conf']);
 
-		if (isset($this->metaDatas['Taxonomy']) && sizeof($this->metaDatas['Taxonomy'])>0) {
-			$this->setTaxonomy($this->metaDatas['Taxonomy']);
+		if (isset($this->metadatas['Taxonomy']) && sizeof($this->metadatas['Taxonomy'])>0) {
+			$this->setTaxonomy($this->metadatas['Taxonomy']);
 		}
 
 		//Setting name+ extension of the file to write
-		if (isset($this->metaDatas['General']['slug']) && $this->metaDatas['General']['slug'] != "") {
-			$this->setSlug($this->metaDatas['General']['slug']);
+		if (isset($this->metadatas['General']['slug']) && $this->metadatas['General']['slug'] != "") {
+			$this->setSlug($this->metadatas['General']['slug']);
 		} else {
-			$this->setSlug($this->dic['util']['slugify']->slugify($this->metaDatas['General']['title']));
+			$this->setSlug($this->dic['util']['slugify']->slugify($this->metadatas['General']['title']));
 		}
 
-		if (isset($this->metaDatas['General']['file_extension']) && $this->metaDatas['General']['file_extension'] != "") {
-			$this->finalWwwFilename = $this->getSlug() . '.' . $this->metaDatas['General']['file_extension'];
+		if (isset($this->metadatas['General']['file_extension']) && $this->metadatas['General']['file_extension'] != "") {
+			$this->finalWwwFilename = $this->getSlug() . '.' . $this->metadatas['General']['file_extension'];
 		} else {
 			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['www_file_extension'];
 		}
@@ -219,7 +248,7 @@ class Post
 	public function hydrate()
 	{
 		if ($this->output->getVerbosity()==2) {
-			foreach ($this->metaDatas['General'] as $k => $v) {
+			foreach ($this->metadatas['General'] as $k => $v) {
 				if (is_array($v)) {
 					$options = '{';
 					foreach ($v as $v2) {
@@ -234,15 +263,39 @@ class Post
 			$this->writeOutput($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
 		}
 		$this->html = $this->dic['twig']['parser']->render(
-			$this->metaDatas['General']['template'].'.twig',
-			array_merge($this->metaDatas['General'], array("content" => $this->content))
+			$this->metadatas['General']['template'].'.twig',
+			array_merge($this->metadatas['General'], array("content" => $this->content))
 		); 
 
 		return $this;
 	}
 
+	public function attachToTaxonomy() 
+	{
+		if (false === isset($this->dic['taxonomy']) || false === $this->dic['taxonomy']->isInitiated()) {
+			throw new \Exception("You tried to attach a post to the general Taxonomy before having initiated it");
+		}
+
+		if (false === is_string($this->metadatas['General']['title'])) {
+			throw new \Exception("Please affect a metadata entry 'title' to text file".$this->getFilepath());
+		}
+
+		array_walk_recursive($this->getTaxonomy(), function($value, $key, $args) {
+			$taxon = $args['taxonomy']->retrieveTaxonFromName($value);
+			if(false === $taxon) {
+				throw new \Exception("You affected the post named '".$args['postObject']->metadatas['General']['title']."' to a Taxon named '$value' which is not declared in your configuration");
+			}
+			$args['postObject']->addTaxon($taxon);
+			$taxon->addPost($args['postObject']);
+		}, array(
+			'taxonomy'     => $this->dic['taxonomy'],
+			'postObject'    => $this, )
+		);
+
+	}
+
 	/**
-	 * Finally write the html into the final www file
+	 * Write the html into the final www file
 	 * Must be called after hydrate()
 	 * Do check that the file written is what it should look like, then return true
 	 * If something wrong written to disc, return false

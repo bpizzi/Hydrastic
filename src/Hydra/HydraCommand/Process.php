@@ -73,7 +73,7 @@ EOF
 				->setTaxa()
 				->parseContent()
 				->hydrate()
-				->writeToFile();
+				->attachToTaxonomy();
 
 		} //-- parsing content files
 

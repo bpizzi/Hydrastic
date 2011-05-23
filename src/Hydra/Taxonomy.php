@@ -12,6 +12,7 @@
 namespace Hydra;
 
 use Symfony\Component\Console\Output\OutputInterface;
+
 use \SplObjectStorage;
 
 /**
@@ -50,6 +51,8 @@ class Taxonomy
 
 	protected $taxonStorage = array(); //Hold taxon objects
 
+	protected $initiated;
+
 
 	/**
 	 * Constructs the Taxonomy object
@@ -61,6 +64,17 @@ class Taxonomy
 	{
 		$this->dic = $dic;
 		$this->setTaxonStorage(new SplObjectStorage());
+		$this->setInitiated(false);
+	}
+
+	public function isInitiated() 
+	{
+		return $this->initiated;
+	}
+
+	public function setInitiated($bool)
+	{
+		$this->initiated = $bool;
 	}
 
 	public function getTaxonStorage()
@@ -101,7 +115,7 @@ class Taxonomy
 				$parent->addChild($subParent);
 			}
 
-			if(is_array($child)) {
+			if (is_array($child)) {
 				//If the taxon as children
 				//echo "Going into deep init for ".sizeof($child)." children of : $parentName\n";
 				$this->initiateTaxonStorage($child, &$subParent, $level); 
@@ -114,10 +128,13 @@ class Taxonomy
 				$subParent->addChild($newChild);
 			}
 
-			if($level === 0) {
+			if ($level === 0) {
 				//echo "Added ".$subParent->getName()." as a known taxon\n";
 				$this->addTaxon($subParent);
 			}
+		}
+		if ($level === 0) {
+			$this->setInitiated(true);
 		}
 	}
 
@@ -130,7 +147,7 @@ class Taxonomy
 	 */
 	public function retrieveTaxonFromName($taxonName, $taxonStorage = null, $level = 0) 
 	{
-		if(is_null($taxonStorage)) {
+		if (is_null($taxonStorage)) {
 			//echo "\n\n----------------------\nlooking for $taxonName...\n";
 			$taxonStorage = $this->getTaxonStorage();
 		}

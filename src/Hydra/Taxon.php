@@ -24,15 +24,27 @@ class Taxon
 	protected $parent = null;
 	protected $level;
 	protected $children;
+	protected $postStorage;
 
 	public function __construct()
 	{
 		$this->setChildren(new SplObjectStorage());
+		$this->setPostStorage(new SplObjectStorage());
 	}
 
 	public function __toString() 
 	{
 		return $this->getName();
+	}
+
+	public function setPostStorage($postStorage) 
+	{
+		$this->postStorage = $postStorage;
+	}
+
+	public function getPostStorage()
+	{
+		return $this->postStorage;
 	}
 
 	public function setName($name) { 
@@ -73,11 +85,10 @@ class Taxon
 
 	public function addChild($child) 
 	{
-		if (is_a($child, "Hydra\Taxon")) {
-			$this->getChildren()->attach($child, $child->getName());
-		} else {
+		if (false === is_a($child, "Hydra\Taxon")) {
 			throw new \Exception("\$taxon->addChild() except a Taxon object as first parameter.");
-		}
+		} 
+		$this->getChildren()->attach($child, $child->getName());
 	}
 
 	public function getChildrenNumber() 
@@ -87,6 +98,22 @@ class Taxon
 	public function hasChildren()
 	{
 		return $this->getChildrenNumber() > 0 ? true : false;
+	}
+
+	public function addPost($post)
+	{
+		if (false === is_a($post, "Hydra\Post")) {
+			throw new \Exception("addPost except a Hydra\Post object as a first argument");
+		}
+		$this->getPostStorage()->attach($post);
+	}
+
+	public function hasPost($post)
+	{
+		if (false === is_a($post, "Hydra\Post")) {
+			throw new \Exception("hasPost except a Hydra\Post object as a first argument");
+		}
+		return $this->getPostStorage()->contains($post) ? true : false;
 	}
 
 }
