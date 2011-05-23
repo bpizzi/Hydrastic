@@ -72,53 +72,41 @@ class Taxonomy
 		$this->taxonStorage->attach($taxon, $taxon->getName());
 	}
 
-	public function initiateTaxonStorage() 
+	public function initiateTaxonStorage($children = null, &$parent = null, $level = -1) 
 	{
-		foreach ($this->dic['conf']['Taxonomy'] as $parentName => $child) {
-			//echo "New parent : $parentName, level 0\n";
-			$parent = new Taxon();
-			$parent->setName($parentName);
-			$parent->setLevel(0); 
+		$level ++;
+		if (null === $children) {
+			$children = $this->dic['conf']['Taxonomy'];
+		}
+		foreach ($children as $parentName => $child) {
+			//echo "New parent : $parentName, level $level\n";
+			$subParent = new Taxon();
+			if (is_int($parentName)) {
+				$subParent->setName(null);
+			} else {
+				$subParent->setName($parentName);
+			}
+			$subParent->setLevel($level); 
+			if (null !== $parent) {
+				$parent->addChild($subParent);
+			}
 
 			if(is_array($child)) {
 				//If the taxon as children
 				//echo "Going into deep init for ".sizeof($child)." children of : $parentName\n";
-				$this->deepTaxonInit($child, $parent, 0); 
+				$this->initiateTaxonStorage($child, &$subParent, $level); 
 			} else {
 				//echo "New child : $child, level 1\n";
-				$child = new Taxon();
-				$child->setName($child);
-				$child->setLevel(1);
-				$parent->addChild($child);
+				$newChildLevel = $level + 1;
+				$newChild = new Taxon();
+				$newChild->setName($child);
+				$newChild->setLevel($newChildLevel);
+				$subParent->addChild($newChild);
 			}
-			$this->addTaxon($parent, $parent->getName());
-		}
-	}
 
-	public function deepTaxonInit($children, &$parent, $level)
-	{
-		$level++;
-		foreach ($children as $childName => $grandChildName) {
-			//echo "New parent : $childName, level $level\n";
-			$subParent = new Taxon();
-			if (is_int($childName)) {
-				$subParent->setName(null);
-			} else {
-				$subParent->setName($childName);
-			}
-			$subParent->setLevel($level);
-			$parent->addChild($subParent);
-
-			if (is_array($grandChildName)) {
-				//echo "Going into deep init for ".sizeof($grandChildName)." children of : $childName\n";
-				$this->deepTaxonInit($grandChildName, $subParent, $level); //recursivity's magic
-			} else {
-				$grandChildLevel = $level + 1;
-				//echo "New child : $grandChildName, level $grandChildLevel\n";
-				$grandChild = new Taxon();
-				$grandChild->setName($grandChildName);
-				$grandChild->setLevel($grandChildLevel);
-				$subParent->addChild($grandChild);
+			if($level === 0) {
+				//echo "Added ".$subParent->getName()." as a known taxon\n";
+				$this->addTaxon($subParent);
 			}
 		}
 	}
