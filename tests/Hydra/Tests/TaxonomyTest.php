@@ -53,7 +53,11 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy']->initiateTaxonStorage();
 
 		//var_dump($this->dic['taxonomy']->getTaxonStorage());
-		//$this->assertTrue($this->dic['taxonomy']->getTaxonStorage()->contains())
+
+		$this->assertFalse($this->dic['taxonomy']->retrieveTaxonFromName("The Unknown Taxon"), "An unknown taxon shouldn't be found by retrieveTaxonFromName()");
+
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Cat"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Cat')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subtag2"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subtag2')");
 
 	}
 

@@ -13,6 +13,7 @@ class Taxon
 	protected $dic = array(); //The Dependency Injection Container
 
 	protected $name = null;
+	protected $slug = null;
 	protected $parent = null;
 	protected $level;
 	protected $children;
@@ -22,6 +23,11 @@ class Taxon
 		$this->setChildren(new SplObjectStorage());
 	}
 
+	public function __toString() 
+	{
+		return $this->getName();
+	}
+
 	public function setName($name) { 
 		$this->name = $name; 
 	}
@@ -29,6 +35,15 @@ class Taxon
 	public function getName() 
 	{ 
 		return $this->name; 
+	}
+
+	public function setSlug($slug) { 
+		$this->slug = $slug; 
+	}
+
+	public function getSlug() 
+	{ 
+		return $this->slug; 
 	}
 
 	public function setLevel($level) { 
@@ -56,6 +71,15 @@ class Taxon
 		} else {
 			throw new \Exception("\$taxon->addChild() except a Taxon object as first parameter.");
 		}
+	}
+
+	public function getChildrenNumber() 
+	{
+		return $this->getChildren()->count();
+	}
+	public function hasChildren()
+	{
+		return $this->getChildrenNumber() > 0 ? true : false;
 	}
 
 }

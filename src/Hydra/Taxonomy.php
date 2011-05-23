@@ -7,12 +7,20 @@ use \SplObjectStorage;
 
 /**
  * Taxonomy is classification.
+ *
  * A Taxon is a parent family with children ("A taxon", "Two taxa")
- * Posts are classified with couples of Taxon/Child, ex: "My post" => Categories/CategorieOne, Tags/Tag1, etc...
- * Taxonomy in Hydra only accept two levels of classification :
+ * Each child can be a taxon with or without children.
+ *
+ * Taxonomy in Hydra accept unlimited levels of classification :
  *   Categories:
- *     - First Categorie
+ *     First Categorie:
+ *       Sub-Categorie for first categorie;
+ *         Sub-sub-Categorie for first Sub-sategorie:
+ *           - First element of Sub-Sub-Categorie
+ *       - First element of Sub-Categorie
+ *       - Second element for Sub-Categorie
  *     - Second Categorie
+ *       -First element for Sub-Categorie
  *   Tag:
  *     - First tag
  *     - Second Tag
@@ -20,13 +28,11 @@ use \SplObjectStorage;
  *     - Simple post
  *     - Complex post
  *
- * Taxa and children are affected to a post in its metadata.
+ * A nested tree of taxa is initiated by $this->initiateTaxonStorage(), 
+ * but $this->dic['conf']['Taxonomy'] must have been read before.
  *
- * As the Process Command parse the metadatas of text files, it calls addTaxa.
- * This class then holds three main data structures:
- *  - A list of all taxa and their children
- *  - A list of all posts and their associated taxonomy
- *  - A list of all taxon/child couple and posts classified under it
+ * Posts can tell which taxa they are affected to in their metadatas.
+ *
  *
  * @author Baptiste Pizzighini <baptiste@bpizzi.fr>
  */
@@ -62,7 +68,7 @@ class Taxonomy
 	}
 
 	public function addTaxon($taxon)
- 	{
+	{
 		$this->taxonStorage->attach($taxon, $taxon->getName());
 	}
 
@@ -85,8 +91,8 @@ class Taxonomy
 				$child->setLevel(1);
 				$parent->addChild($child);
 			}
+			$this->addTaxon($parent, $parent->getName());
 		}
-		$this->addTaxon($parent, $parent->getName());
 	}
 
 	public function deepTaxonInit($children, &$parent, $level)
@@ -110,6 +116,38 @@ class Taxonomy
 				$grandChild->setLevel($grandChildLevel);
 				$subParent->addChild($grandChild);
 			}
+		}
+	}
+
+	public function retrieveTaxonFromName($taxonName, $taxonStorage = null, $level = 0) 
+	{
+		if(is_null($taxonStorage)) {
+			//echo "\n\n----------------------\nlooking for $taxonName...\n";
+			$taxonStorage = $this->getTaxonStorage();
+		}
+		$taxonStorage->rewind();
+
+		while($taxonStorage->valid()) {
+			$taxon = $taxonStorage->current();
+			//echo $taxon->getName()." at level ".$taxon->getLevel()." TEST -".$taxon->getName()."- === -".$taxonName."- \n";
+			if ($taxon->getName() === $taxonName) {
+				//echo "FOUND\n";
+				return $taxon;
+			}
+			if ($taxon->hasChildren()) {
+				//echo $taxon->getName() ." has ".$taxon->getChildrenNumber()." children \n";
+				$levelUp = $level + 1;
+				$deepSearch = $this->retrieveTaxonFromName($taxonName, $taxon->getChildren(), $levelUp);
+				if (is_a($deepSearch, "Hydra\Taxon")) {
+                  return $deepSearch;
+				}
+			}
+			$taxonStorage->next();
+		}
+
+		if ($level == 0) {
+			//echo "NOT FOUND\n";
+			return false;
 		}
 	}
 
