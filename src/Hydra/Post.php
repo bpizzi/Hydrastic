@@ -52,7 +52,7 @@ class Post
 	public function __construct($dic)
 	{
 		$this->dic = $dic;
-		if(isset($dic["output"])) {
+		if (isset($dic["output"])) {
 			$this->output = $dic['output'];
 		}
 		$this->setTaxonStorage(new SplObjectStorage());
@@ -138,6 +138,12 @@ class Post
 		$this->filepath = $filepath;
 	}
 
+	public function setFileArray($array)
+	{
+		$this->fileArray = $array;
+	}
+
+
 	public function hasTaxon($taxon)
 	{
 		if (true === is_a($taxon, "Hydra\Taxon")) {
@@ -180,7 +186,7 @@ class Post
 	 */
 	public function clean()
 	{
-		$this->fileArray = file($this->filepath);
+		$this->setFileArray(file($this->getFilepath()));
 		array_walk($this->fileArray, function(&$item, $key) {
 			$item = str_replace("\n", '', $item);
 		});                                     
@@ -282,13 +288,14 @@ class Post
 
 		array_walk_recursive($this->getTaxonomy(), function($value, $key, $args) {
 			$taxon = $args['taxonomy']->retrieveTaxonFromName($value);
-			if(false === $taxon) {
-				throw new \Exception("You affected the post named '".$args['postObject']->metadatas['General']['title']."' to a Taxon named '$value' which is not declared in your configuration");
+			if (false === $taxon) {
+				throw new \Exception("You affected the post named '".$args['postTitle']."' to a Taxon named '$value' which is not declared in your configuration");
 			}
 			$args['postObject']->addTaxon($taxon);
 			$taxon->addPost($args['postObject']);
 		}, array(
 			'taxonomy'     => $this->dic['taxonomy'],
+			'postTitle'     => $this->metadatas['General']['title'],
 			'postObject'    => $this, )
 		);
 
