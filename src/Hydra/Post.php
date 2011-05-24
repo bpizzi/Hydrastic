@@ -227,7 +227,7 @@ class Post
 		if (isset($this->metadatas['General']['file_extension']) && $this->metadatas['General']['file_extension'] != "") {
 			$this->finalWwwFilename = $this->getSlug() . '.' . $this->metadatas['General']['file_extension'];
 		} else {
-			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['www_file_extension'];
+			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['General']['www_file_extension'];
 		}
 
 		return $this;

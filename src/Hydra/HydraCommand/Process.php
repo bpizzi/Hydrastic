@@ -58,7 +58,7 @@ EOF
 
 		$files = $this->dic['finder']['txt_files'];
 
-		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
+		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['General']['txt_file_extension'].'</comment> files');
 
 		$taxonomy = $this->dic['taxonomy'];
 		$taxonomy->initiateTaxonStorage();

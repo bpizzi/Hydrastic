@@ -191,6 +191,10 @@ class Taxonomy
 			$taxon = $taxonStorage->current();
 
 			$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/'.$taxon->getName();
+
+			if (file_exists($dir)) {
+				rmdir($dir);
+			} 
 			mkdir($dir);
 
 			$taxonStorage->next();
