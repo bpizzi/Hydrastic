@@ -182,6 +182,19 @@ class Taxonomy
 	}
 
 	public function createDirectoryStruct() {
+	
+		$taxonStorage = $this->getTaxonStorage();
+		
+		$taxonStorage->rewind();
+
+		while($taxonStorage->valid()) {
+			$taxon = $taxonStorage->current();
+
+			$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/'.$taxon->getName();
+			mkdir($dir);
+
+			$taxonStorage->next();
+		}
 
 	}
 

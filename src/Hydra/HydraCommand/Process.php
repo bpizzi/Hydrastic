@@ -77,6 +77,8 @@ EOF
 
 		} //-- parsing content files
 
+		$taxonomy->createDirectoryStruct();
+
 		$output->writeln('----->');
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Done.');

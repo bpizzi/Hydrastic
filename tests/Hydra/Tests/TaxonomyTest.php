@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  *
  */
-
+require_once 'vfsStream/vfsStream.php';
 
 use Hydra\Taxonomy;
 use Hydra\Post;
@@ -36,6 +36,11 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	}
 
+	/**
+	 *
+	 * @test
+	 * @group TaxonomyGeneration
+	 */
 	public function testParsingCorrectlyYamlTaxonomyFile()
 	{
 		$expected = array(
@@ -58,6 +63,11 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $result, "Correctly parsing taxonomy from hydra-conf");
 	}
 
+	/**
+	 *
+	 * @test
+	 * @group TaxonomyGeneration
+	 */
 	public function testTaxonomyInitiateCorrectlyItsTaxonStorage()
 	{
 		$this->assertFalse($this->dic['taxonomy']->isInitiated(), "isInitiated returns false before initiateTaxonStorage()");
@@ -73,6 +83,11 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	}
 
+	/**
+	 *
+	 * @test
+	 * @group TaxonomyGeneration
+	 */
 	public function testMutualAttachBetweenTaxonAndPost()
 	{
 		$this->dic['taxonomy']->initiateTaxonStorage();
@@ -99,4 +114,33 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	}
 
+	/**
+	 * This test use vfsStream : http://code.google.com/p/bovigo/wiki/vfsStream
+	 * "vfsStream is a stream wrapper for a virtual file system that may be helpful in unit tests to mock the real file system."
+	 * Install it first : 
+	 *   $ pear channel-discover pear.php-tools.net
+	 *   $ pear install pat/vfsStream-beta
+	 *
+	 * @test
+	 * @group WritingToDisc
+	 */
+	public function testCreateDirectoryStruct()
+	{
+		//Mocking the filesystem
+		vfsStreamWrapper::register();
+		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydraRoot'));
+
+		//Quickly testing if vfsStream works well... just to be sure...
+		mkdir(vfsStream::url('hydraRoot/www'));
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
+
+
+		$this->dic['working_directory'] = vfsStream::url('hydraRoot');
+		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
+		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
+
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/Cat'), "Cat/ should have been created by createDirectoryStruct()");
+
+
+	}
 }
