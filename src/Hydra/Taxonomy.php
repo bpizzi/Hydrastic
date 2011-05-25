@@ -1,5 +1,5 @@
 <?php
- /**
+/**
  * This file is part of the Hydra package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
@@ -12,6 +12,7 @@
 namespace Hydra;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\DialogHelper;
 
 use \SplObjectStorage;
 
@@ -181,16 +182,53 @@ class Taxonomy
 
 	}
 
+	public function cleanWwwDir() 
+	{
+		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/';
+
+		switch (PHP_OS) {
+			case "Linux":
+			case "FreeBSD":
+			case "NetBSD":
+			case "OpenBSD":
+			case "Unix":
+			case "Darwin":
+				$cmd = "rm -rf ";
+				break;
+			case "WINNT":
+			case "WIN32":
+			case "Windows":
+				$cmd = "rmdir /s /q ";
+				break;
+			default:
+				break;
+		}
+
+		$cmd .= $dir;
+
+		if (isset($this->dic['output'])) {
+			$this->dic['output']->writeln('---');
+			$dialog = new DialogHelper();
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' I need to clean the www directory, but I request your permission before deleting anything on your filesystem :');
+			$question = $this->dic['conf']['command_prefix']." Do you allow me to run '<comment>".$cmd."</comment>' (recursively delete everything in that folder)  ? (<info>y/n</info>)";
+			if (true === $dialog->askConfirmation($this->dic['output'], $question, false)) {
+				system($cmd);
+			} 
+		}
+
+		return $this;
+	}
+
 	public function createDirectoryStruct() {
-	
+
 		$taxonStorage = $this->getTaxonStorage();
-		
+
 		$taxonStorage->rewind();
 
 		while($taxonStorage->valid()) {
 			$taxon = $taxonStorage->current();
 
-			$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/'.$taxon->getName();
+			$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/'.$taxon->getSlug();
 
 			if (file_exists($dir)) {
 				rmdir($dir);

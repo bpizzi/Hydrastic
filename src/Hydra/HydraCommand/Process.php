@@ -77,7 +77,7 @@ EOF
 
 		} //-- parsing content files
 
-		$taxonomy->createDirectoryStruct();
+		$taxonomy->cleanWwwDir()->createDirectoryStruct();
 
 		$output->writeln('----->');
 
