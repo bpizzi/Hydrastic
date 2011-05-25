@@ -26,8 +26,9 @@ class Taxon
 	protected $children;
 	protected $postStorage;
 
-	public function __construct()
+	public function __construct($dic)
 	{
+		$this->dic = $dic;
 		$this->setChildren(new SplObjectStorage());
 		$this->setPostStorage(new SplObjectStorage());
 	}
@@ -49,6 +50,11 @@ class Taxon
 
 	public function setName($name) { 
 		$this->name = $name; 
+		if (isset($this->dic['util'])) {
+			$this->setSlug($this->dic['util']['slugify']->slugify($name));
+		} else {
+			throw new \Exception("You should register 'util' service before calling \$taxon->setName() (it uses \$dic['util']['slugify'] to initiate the taxon slug)");
+		}
 	}
 
 	public function getName() 

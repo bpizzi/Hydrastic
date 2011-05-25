@@ -139,7 +139,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
-		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/Cat'), "Cat/ should have been created by createDirectoryStruct()");
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat'), "cat/ should have been created by createDirectoryStruct()");
 
 
 	}

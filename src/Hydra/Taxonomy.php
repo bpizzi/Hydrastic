@@ -105,7 +105,7 @@ class Taxonomy
 		}
 		foreach ($children as $parentName => $child) {
 			//echo "New parent : $parentName, level $level\n";
-			$subParent = new Taxon();
+			$subParent = new Taxon($this->dic);
 			if (is_int($parentName)) {
 				$subParent->setName(null);
 			} else {
@@ -123,7 +123,7 @@ class Taxonomy
 			} else {
 				//echo "New child : $child, level 1\n";
 				$newChildLevel = $level + 1;
-				$newChild = new Taxon();
+				$newChild = new Taxon($this->dic);
 				$newChild->setName($child);
 				$newChild->setLevel($newChildLevel);
 				$subParent->addChild($newChild);
@@ -213,7 +213,10 @@ class Taxonomy
 			$question = $this->dic['conf']['command_prefix']." Do you allow me to run '<comment>".$cmd."</comment>' (recursively delete everything in that folder)  ? (<info>y/n</info>)";
 			if (true === $dialog->askConfirmation($this->dic['output'], $question, false)) {
 				system($cmd);
-			} 
+				$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Ran <comment>$cmd</comment>.");
+			} else {
+				$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Didn't cleaned www directory, you should see some warnings... ");
+			}
 		}
 
 		return $this;
@@ -230,10 +233,11 @@ class Taxonomy
 
 			$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/'.$taxon->getSlug();
 
-			if (file_exists($dir)) {
-				rmdir($dir);
-			} 
 			mkdir($dir);
+			if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {;
+				$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
+			}
+
 
 			$taxonStorage->next();
 		}

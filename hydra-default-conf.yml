@@ -7,8 +7,7 @@ General:
   www_file_extension: html
   txt_file_extension: txt
 metadata_defaults:
-  General: 
-    template: post
-    title: Please override me !
-    description: Please override me !
-    author: Please override me !
+  template: post
+  title: Please override me !
+  description: Please override me !
+  author: Please override me !

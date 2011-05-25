@@ -10,10 +10,11 @@
  */
 
 
-use Hydra\Post;
+use Hydra\Taxon;
 use Hydra\Service\Yaml as YamlService;
+use Hydra\Service\Util as UtilService;
 
-class PostTest extends PHPUnit_Framework_TestCase
+class TaxonTest extends PHPUnit_Framework_TestCase
 {
 
 	protected $dic = array();
@@ -23,11 +24,17 @@ class PostTest extends PHPUnit_Framework_TestCase
 		$this->dic = new Pimple();
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['yaml']   = $this->dic->share(function ($c) { return new YamlService($c); });
+		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
 
 	}
 
 	public function testConstruct()
 	{
+		$taxon = new Taxon($this->dic);
+		$taxon->setName('This is a nice Cat');
 
+		$this->assertEquals($taxon->getSlug(), 'this-is-a-nice-cat', 'Taxon automatic slugging is correctly handled');
 	}
+
+
 }

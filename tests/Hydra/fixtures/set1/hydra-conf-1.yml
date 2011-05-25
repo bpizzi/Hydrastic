@@ -1,11 +1,11 @@
 version: 0.1
 command_prefix: <info>Hydra></info>
-www_file_extension: html
-txt_file_extension: txt
 General:
   txt_dir: txt
   tpl_dir: tpl
   www_dir: www
+  www_file_extension: html
+  txt_file_extension: txt
 metadata_defaults:
   title: Hydra 
   description: Hydra is a static website generator
