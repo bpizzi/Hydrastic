@@ -184,7 +184,7 @@ class Taxonomy
 
 	public function cleanWwwDir() 
 	{
-		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/';
+		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/*';
 
 		switch (PHP_OS) {
 			case "Linux":
