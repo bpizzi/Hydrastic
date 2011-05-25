@@ -187,21 +187,21 @@ class Taxonomy
 		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/*';
 
 		switch (PHP_OS) {
-			case "Linux":
-			case "FreeBSD":
-			case "NetBSD":
-			case "OpenBSD":
-			case "Unix":
-			case "Darwin":
-				$cmd = "rm -rf ";
-				break;
-			case "WINNT":
-			case "WIN32":
-			case "Windows":
-				$cmd = "rmdir /s /q ";
-				break;
-			default:
-				break;
+		case "Linux":
+		case "FreeBSD":
+		case "NetBSD":
+		case "OpenBSD":
+		case "Unix":
+		case "Darwin":
+			$cmd = "rm -rf ";
+			break;
+		case "WINNT":
+		case "WIN32":
+		case "Windows":
+			$cmd = "rmdir /s /q ";
+			break;
+		default:
+			break;
 		}
 
 		$cmd .= $dir;
@@ -222,22 +222,53 @@ class Taxonomy
 		return $this;
 	}
 
-	public function createDirectoryStruct() {
+	public function createDirectoryStruct($taxonStorage = null, $path = null, $level = 0) {
 
-		$taxonStorage = $this->getTaxonStorage();
+		$baseDir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'];
+		if (null === $taxonStorage) {
+			$taxonStorage = $this->getTaxonStorage();
+		}
+
+		if (null === $path || $level == 0) {
+			$levelDir = $baseDir;
+			$path = '';
+		} else {
+			$levelDir = $baseDir.$path;
+		}
 
 		$taxonStorage->rewind();
 
 		while($taxonStorage->valid()) {
 			$taxon = $taxonStorage->current();
 
-			$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/'.$taxon->getSlug();
+			if ($taxon->getName() != '') {
 
-			mkdir($dir);
-			if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {;
-				$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
+				$dir = $levelDir.'/'.$taxon->getSlug();
+
+				//$tab = "";
+				//for ($i = 0; $i < $level; $i++) {
+					//$tab .= "  ";
+				//}
+				//echo "\n$tab-'".$taxon->getName()."' ===> path = $path   /   dir = $dir\n";
+
+				mkdir($dir);
+
+				if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
+				}
+
 			}
 
+			if ($taxon->hasChildren() && $taxon->getName() != "") {
+				$childPath = $path.'/'.$taxon->getSlug();
+			} else {
+                $childPath = $path;
+			}
+
+			if ($taxon->hasChildren()) {
+				$childLevel = $level + 1;
+				$this->createDirectoryStruct($taxon->getChildren(), $childPath, $childLevel);
+			}
 
 			$taxonStorage->next();
 		}

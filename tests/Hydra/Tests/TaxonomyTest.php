@@ -140,6 +140,9 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat'), "cat/ should have been created by createDirectoryStruct()");
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat/cat1'), "cat/cat1 should have been created by createDirectoryStruct()");
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/elem1subtag1'), "tag/Subtag1/Elem1Subtag1 should have been created by createDirectoryStruct()");
+		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/subtag2/elem1subtag2'), "Avoiding path bug in recursivity : tag/subtag1/subtag2/elem1subtag2 shouldn't exist");
 
 
 	}
