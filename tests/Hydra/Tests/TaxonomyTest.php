@@ -15,6 +15,7 @@ use Hydra\Post;
 use Hydra\Service\Yaml as YamlService;
 use Hydra\Service\Finder as FinderService;
 use Hydra\Service\Util as UtilService;
+use Hydra\Service\Twig as TwigService;
 
 class TaxonomyTest extends PHPUnit_Framework_TestCase
 {
@@ -31,6 +32,8 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['finder'] = $this->dic->share(function ($c) { return new FinderService($c); });
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
+		$this->dic['twig']   = $this->dic->share(function ($c) { return new TwigService($c); });
+		$this->dic['hydra_dir'] = __DIR__.'/../../../';
 
 		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydra-conf-1.yml')); 
 
@@ -144,6 +147,22 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/elem1subtag1'), "tag/Subtag1/Elem1Subtag1 should have been created by createDirectoryStruct()");
 		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/subtag2/elem1subtag2'), "Avoiding path bug in recursivity : tag/subtag1/subtag2/elem1subtag2 shouldn't exist");
 
+
+		$post = new Post($this->dic);
+		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
+		$this->dic['working_directory'] = $this->fixDir; //Allows $post->hydrate() to find twig template
+		$post->read($file)
+			->clean()
+			->parseMetas()
+			->parseContent()
+			->hydrate()
+			->attachToTaxonomy();
+
+		$this->dic['working_directory'] = vfsStream::url('hydraRoot'); //Returning to vfsStream
+		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
+		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
+		$this->assertTrue(file_exists(vfsStream::url('hydraRoot/www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
+		//$this->assertTrue(file_exists(vfsStream::url('hydraRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
 
 	}
 }

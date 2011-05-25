@@ -60,7 +60,7 @@ class Post
 
 	public function __toString()
 	{
-		$ret = $this->getMetaDatas['General']['title'];
+		$ret = $this->metadatas['General']['title'];
 		return is_string($ret) ? $ret : "";
 	}
 
@@ -253,7 +253,7 @@ class Post
 	 */
 	public function hydrate()
 	{
-		if ($this->output->getVerbosity()==2) {
+		if (null != $this->output && $this->output->getVerbosity()==2) {
 			foreach ($this->metadatas['General'] as $k => $v) {
 				if (is_array($v)) {
 					$options = '{';
@@ -306,15 +306,18 @@ class Post
 	 * Must be called after hydrate()
 	 * Do check that the file written is what it should look like, then return true
 	 * If something wrong written to disc, return false
+	 *
+	 * @params string $path The full path to the directory in which this post will be put
 	 */
-	public function writeToFile() 
+	public function writeToFile($path) 
 	{
-		$fileToWrite = $this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/'.$this->finalWwwFilename;
+		$fileToWrite = $path.'/'.$this->finalWwwFilename;
 
 		// Write the html
 		file_put_contents($fileToWrite, $this->html);
 		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->html) {
 			$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');
+			//echo "\n written $fileToWrite\n";
 			return true;
 		}
 		$this->writeOutput($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrating <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');

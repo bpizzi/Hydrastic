@@ -122,4 +122,16 @@ class Taxon
 		return $this->getPostStorage()->contains($post) ? true : false;
 	}
 
+	/**
+	 * Returns true if $this->postStorage has at least one post
+	 */
+	public function hasPosts()
+	{
+		return $this->getPostsNumber() > 0 ? true : false;
+	}
+
+	public function getPostsNumber()
+	{
+		return $this->getPostStorage()->count();
+	}
 }

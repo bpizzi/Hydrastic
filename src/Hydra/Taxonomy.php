@@ -247,7 +247,7 @@ class Taxonomy
 
 				//$tab = "";
 				//for ($i = 0; $i < $level; $i++) {
-					//$tab .= "  ";
+				//$tab .= "  ";
 				//}
 				//echo "\n$tab-'".$taxon->getName()."' ===> path = $path   /   dir = $dir\n";
 
@@ -257,12 +257,26 @@ class Taxonomy
 					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
 				}
 
+				if ($taxon->hasPosts()) {
+					$postStorage = $taxon->getPostStorage();
+					$postStorage->rewind();
+
+					while ($postStorage->valid()) {
+						$post = $postStorage->current();
+						$post->writeToFile($dir);
+						if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+							$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Filled <info>$taxon</info> with <info>$post</info>.");
+						}
+						$postStorage->next();
+					}
+				}
+
 			}
 
 			if ($taxon->hasChildren() && $taxon->getName() != "") {
 				$childPath = $path.'/'.$taxon->getSlug();
 			} else {
-                $childPath = $path;
+				$childPath = $path;
 			}
 
 			if ($taxon->hasChildren()) {
