@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -9,12 +9,12 @@
  *
  */
 
-namespace Hydra;
+namespace Hydrastic;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Hydra\Taxonomy;
-use Hydra\ArrayMerger;
+use Hydrastic\Taxonomy;
+use Hydrastic\ArrayMerger;
 
 use \SplObjectStorage;
 
@@ -146,7 +146,7 @@ class Post
 
 	public function hasTaxon($taxon)
 	{
-		if (true === is_a($taxon, "Hydra\Taxon")) {
+		if (true === is_a($taxon, "Hydrastic\Taxon")) {
 			return $this->getTaxonStorage()->contains($taxon) ? true : false;
 		} 
 		return false;
@@ -154,8 +154,8 @@ class Post
 
 	public function addTaxon($taxon)
 	{
-		if (false === is_a($taxon, "Hydra\Taxon")) {
-			throw new \Exception("addTaxon except a Hydra\Taxon object as a first argument");
+		if (false === is_a($taxon, "Hydrastic\Taxon")) {
+			throw new \Exception("addTaxon except a Hydrastic\Taxon object as a first argument");
 		}
 		$this->getTaxonStorage()->attach($taxon);
 	}
@@ -207,9 +207,9 @@ class Post
 		// Parse the metadatas in a array, using defaults when necessary
 		$this->setMetadatas($this->dic['yaml']['parser']->parse($metaDatasStr));
 
-		array_walk($this->metadatas['General'], function(&$item, $key, $hydraConf) {
+		array_walk($this->metadatas['General'], function(&$item, $key, $conf) {
 			if ($item == "") {
-				$item = $hydraConf['metadata_defaults']['General'][$key];
+				$item = $conf['metadata_defaults']['General'][$key];
 			}
 		}, $this->dic['conf']);
 
@@ -247,7 +247,7 @@ class Post
 	}
 
 	/**
-	 * Hydrate a template with $content, respect $metaData and $dic['conf'] when needed
+	 * Hydrasticte a template with $content, respect $metaData and $dic['conf'] when needed
 	 * Must be called after parseContent() and parseMetas()
 	 * And proceed to further actions
 	 */

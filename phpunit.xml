@@ -12,8 +12,8 @@
          bootstrap="tests/bootstrap.php"
 >
     <testsuites>
-        <testsuite name="Hydra Test Suite">
-            <directory>./tests/Hydra/</directory>
+        <testsuite name="Hydrastic Test Suite">
+            <directory>./tests/Hydrastic/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

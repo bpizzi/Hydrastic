@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,8 +10,8 @@
  */
 
 
-use Hydra\Post;
-use Hydra\Service\Yaml as YamlService;
+use Hydrastic\Post;
+use Hydrastic\Service\Yaml as YamlService;
 
 class PostTest extends PHPUnit_Framework_TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrasticsticstic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -13,16 +13,16 @@
 require_once __DIR__.'/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Hydra\Taxonomy;
-use Hydra\HydraCommand\Process;
-use Hydra\HydraCommand\Compile;
-use Hydra\HydraCommand\Shell;
-use Hydra\HydraCommand\Version;
-use Hydra\HydraCommand\Init;
-use Hydra\Service\Twig as TwigService;
-use Hydra\Service\Yaml as YamlService;
-use Hydra\Service\Finder as FinderService;
-use Hydra\Service\Util as UtilService;
+use Hydrastic\Taxonomy;
+use Hydrastic\Command\Process;
+use Hydrastic\Command\Compile;
+use Hydrastic\Command\Shell;
+use Hydrastic\Command\Version;
+use Hydrastic\Command\Init;
+use Hydrastic\Service\Twig as TwigService;
+use Hydrastic\Service\Yaml as YamlService;
+use Hydrastic\Service\Finder as FinderService;
+use Hydrastic\Service\Util as UtilService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
@@ -40,9 +40,9 @@ if( $workingDir == '' ) {
 	//Currently outside a phar archive
 	$dic['inside_phar'] = false;
 	$dic['working_directory'] = dirname(__DIR__);
-	$dic['hydra_dir'] = __DIR__;
-	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml'));
-	$userConfFile = $dic['working_directory'].'/hydra-conf.yml';
+	$dic['hydrastic_dir'] = __DIR__;
+	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydrastic-default-conf.yml'));
+	$userConfFile = $dic['working_directory'].'/hydrastic-conf.yml';
 	if(file_exists($userConfFile)) {
 		$userConf = $dic['yaml']['parser']->parse(file_get_contents($userConfFile)); 
 	} else {
@@ -51,18 +51,18 @@ if( $workingDir == '' ) {
 } else {
 	//Currently inside a phar archive
 	$dic['inside_phar'] = true;
-	$dic['working_directory'] = str_replace(array('phar:/','hydra.phar'), '', $workingDir);
-	$dic['hydra_dir'] = Phar::running();
-	$userConfFile = $workingDir.'/hydra-conf.yml';
+	$dic['working_directory'] = str_replace(array('phar:/','hydrastic.phar'), '', $workingDir);
+	$dic['hydrastic_dir'] = Phar::running();
+	$userConfFile = $workingDir.'/hydrastic-conf.yml';
 	if(file_exists($userConfFile)) {
-		Phar::mount('hydra-conf.yml', $userConfFile);
-		$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydra-conf.yml'));
+		Phar::mount('hydrastic-conf.yml', $userConfFile);
+		$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydrastic-conf.yml'));
 		$dic['user_conf_defined'] = true;
 	} else {
 		$dic['user_conf_defined'] = false;
 		$userConf = array();
 	}
-	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydra-default-conf.yml')); 
+	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydrastic-default-conf.yml')); 
 }
 $dic['conf'] = $dic['util']['array.merger']->mergeUniqueKeysRecursive($defaultConf, $userConf);
 
@@ -74,22 +74,22 @@ $dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });
 $dic['finder'] = $dic->share(function ($c) { return new FinderService($c); });
 
 // Declare (Symfony Component) Application 
-$dic['hydra_app'] = new Application('Hydra',$dic['conf']['version']);
+$dic['hydrastic_app'] = new Application('Hydrastic',$dic['conf']['version']);
 
 // Add commands to the Application object
-$hydraCommands = array(
+$commands = array(
 	new Process($dic), 
 	new Shell($dic),
 	new Version($dic),
 	new Init($dic),
 );
 if(!$dic['inside_phar']) {
-	$hydraCommands[] = new Compile($dic);
+	$commands[] = new Compile($dic);
 }
 
-foreach ($hydraCommands as $c) {
-	$dic['hydra_app']->add($c);
+foreach ($commands as $c) {
+	$dic['hydrastic_app']->add($c);
 }
 
 //Run the Application
-$dic['hydra_app']->run();
+$dic['hydrastic_app']->run();

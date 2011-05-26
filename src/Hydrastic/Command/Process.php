@@ -1,6 +1,6 @@
 <?php 
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -9,11 +9,11 @@
  *
  */
 
-namespace Hydra\HydraCommand;
+namespace Hydrastic\command;
 
-use Hydra\ArrayMerger;
-use Hydra\Post;
-use Hydra\Taxonomy;
+use Hydrastic\ArrayMerger;
+use Hydrastic\Post;
+use Hydrastic\Taxonomy;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,11 +39,11 @@ class Process extends SymfonyCommand
 	protected function configure()
 	{
 		$this
-			->setName('hydra:process')
+			->setName('hydrastic:process')
 			->setDefinition(array())
 			->setDescription('Generate your website')
 			->setHelp(<<<EOF
-The <info>hydra:process</info> command generate your website !
+The <info>hydrastic:process</info> command generate your website !
 EOF
 		);
 

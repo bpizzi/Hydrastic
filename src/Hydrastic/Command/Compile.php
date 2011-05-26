@@ -1,6 +1,6 @@
 <?php 
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -9,7 +9,7 @@
  *
  */
 
-namespace Hydra\HydraCommand;
+namespace Hydrastic\Command;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,14 +36,14 @@ class Compile extends SymfonyCommand
 	protected function configure()
 	{
 		$this
-			->setName('hydra:compile')
+			->setName('hydrastic:compile')
 			->setDefinition(array(
 				new InputOption('gz', '', InputOption::VALUE_NONE, 'GZip compression of the archive'),
 			))
-			->addArgument('pharfile', InputArgument::OPTIONAL, '', 'hydra.phar')
-			->setDescription('Compile Hydra files into a PHAR archive')
+			->addArgument('pharfile', InputArgument::OPTIONAL, '', 'hydrastic.phar')
+			->setDescription('Compile Hydrastic files into a PHAR archive')
 			->setHelp(<<<EOF
-The <info>hydra:compile</info> command skrink down Hydra to a single PHAR archive that you can easily embed into your website directory.
+The <info>hydrastic:compile</info> command skrink down Hydrastic to a single PHAR archive that you can easily embed into your website directory.
 EOF
 		);
 
@@ -59,7 +59,7 @@ EOF
 
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Creating archive : '.$pharFile);
-		$phar = new \Phar($pharFile, 0, 'Hydra');
+		$phar = new \Phar($pharFile, 0, 'Hydrastic');
 		$phar->setSignatureAlgorithm(\Phar::SHA1);
 
 		$phar->startBuffering();
@@ -87,9 +87,9 @@ EOF
 		}
 
 		$otherFiles = array(
-			'hydra.php',
+			'hydrastic.php',
 			'autoload.php',
-			'hydra-default-conf.yml',
+			'hydrastic-default-conf.yml',
 			'LICENSE',
 			'vendor/twig/lib/Twig/Compiler.php', //TODO: see why this file isn't loaded by $finder...
 		);
@@ -102,7 +102,7 @@ EOF
 		}
 
 		// Stubs
-		$phar->setDefaultStub('hydra.php');
+		$phar->setDefaultStub('hydrastic.php');
 
 		$phar->stopBuffering();
 
@@ -111,7 +111,7 @@ EOF
 		}
 
 		unset($phar);
-		$output->writeln($this->dic['conf']['command_prefix'].' Done: compiled Hydra to hydra.phar');
+		$output->writeln($this->dic['conf']['command_prefix'].' Done: compiled Hydrastic to hydrastic.phar');
 	}
 
 	protected function addFile($phar, $file, $strip = true)

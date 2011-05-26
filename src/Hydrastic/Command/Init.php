@@ -1,6 +1,6 @@
 <?php 
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -9,7 +9,7 @@
  *
  */
 
-namespace Hydra\HydraCommand;
+namespace Hydrastic\command;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,15 +39,15 @@ class Init extends SymfonyCommand
 	protected function configure()
 	{
 		$this
-			->setName('hydra:init')
+			->setName('hydrastic:init')
 			->setDefinition(array())
 			->setDescription('Initiate folder structure and config file')
 			->setHelp(<<<EOF
-The <info>hydra:init</info> command checks if the current directory could be used for holding your txt/twig/html files.
+The <info>hydrastic:init</info> command checks if the current directory could be used for holding your txt/twig/html files.
 If there no folder in the current place, then you can name some.
-If there is already some folders, you can tell Hydra which one should be used for txt/twig/html files.
-If an hydra-conf.yml exists, <info>hydra:init</info> will ask you to confirm it.
-If there is no hydra-conf.yml yet, you will have the opportunity to create it here
+If there is already some folders, you can tell Hydrastic which one should be used for txt/twig/html files.
+If an hydrastic-conf.yml exists, <info>hydrastic:init</info> will ask you to confirm it.
+If there is no hydrastic-conf.yml yet, you will have the opportunity to create it here
 EOF
 		);
 
@@ -58,7 +58,7 @@ EOF
 		$dialog = new DialogHelper();
 
 		if (!$this->dic['user_conf_defined']) {
-			$output->writeln($this->dic['conf']['command_prefix'].' hydra-conf.yml not found, let\'s see if we can create one together.');
+			$output->writeln($this->dic['conf']['command_prefix'].' hydrastic-conf.yml not found, let\'s see if we can create one together.');
 
 			//Definition of the type of folders
 			$folderConf = array(
@@ -74,7 +74,7 @@ EOF
 
 			// Look for folders in current directory 
 			$f = $this->dic['finder']['find'];
-			$f->directories()->depth('< 2')->in($this->dic['working_directory']);
+			$f->directories()->depth('< 1')->in($this->dic['working_directory']);
 
 			//Foreach folder we found, ask which type of file it should be used for
 			foreach ($f as $d) {
@@ -94,7 +94,7 @@ EOF
 					die();
 				}
 				if ($response === "none") {
-					$output->writeln($this->dic['conf']['command_prefix'].' '.$d->getRelativePathname().' will not be used by Hydra');
+					$output->writeln($this->dic['conf']['command_prefix'].' '.$d->getRelativePathname().' will not be used by Hydrastic');
 				} else {
 					$output->writeln($this->dic['conf']['command_prefix'].' '.$d->getRelativePathname().' will be used for holding <info>'.$response.'</info> files');
 					$folderConf[$response.'_dir'] = $d->getRelativePathname();
@@ -142,7 +142,7 @@ EOF
 				foreach ($siteConf as $k => $v) {
 					$output->writeln('         The configuration key <comment>'.$k.'</comment>, for your site is: <comment>'.$v.'</comment> (key <info>'.$k.'</info>)');
 				}
-				$response = $dialog->ask($output, $this->dic['conf']['command_prefix']." If it looks ok to you, answer <info>done</info>.\n".$this->dic['conf']['command_prefix']." if you want to modify a configuration key now: please indicate me that key (you will have the opportunity to tweak it later by modifying <comment>hydra-conf.tml</comment>)");
+				$response = $dialog->ask($output, $this->dic['conf']['command_prefix']." If it looks ok to you, answer <info>done</info>.\n".$this->dic['conf']['command_prefix']." if you want to modify a configuration key now: please indicate me that key (you will have the opportunity to tweak it later by modifying <comment>hydrastic-conf.tml</comment>)");
 				if ($response == "done") {
 					$confValid = true;
 				} else {
@@ -172,17 +172,17 @@ EOF
 			}
 			$masterConfig = array_merge_recursive($folderConf, array('metadata_defaults' => array('General' => $siteConf)));
 			$dumper = $this->dic['yaml']['dumper'];
-			file_put_contents('hydra-conf.yml',$dumper->dump($masterConfig, 3));
+			file_put_contents('hydrastic-conf.yml',$dumper->dump($masterConfig, 3));
 
 			//Done ! :)
 			$output->writeln($this->dic['conf']['command_prefix'].' Configuration file writed to disc.');
-			$output->writeln($this->dic['conf']['command_prefix'].' You can begin to write your templates and text files and try <info>hydra:process</info> command to generate you static content!');
+			$output->writeln($this->dic['conf']['command_prefix'].' You can begin to write your templates and text files and try <info>hydrastic:process</info> command to generate you static content!');
 
-			//Create an executable shortcut to hydra.phar under linux
+			//Create an executable shortcut to hydrastic.phar under linux
 			if (PHP_OS == 'Linux') {
-				file_put_contents('hydra', "#!/bin/sh\nphp hydra.phar $@");
-				system('chmod +x hydra');
-				$output->writeln($this->dic['conf']['command_prefix'].' I created a shorcut for you : you can now run me with <info>./hydra</info>, assuming PHP binary is accessible from your ENV.');
+				file_put_contents('hydrastic', "#!/bin/sh\nphp hydrastic.phar $@");
+				system('chmod +x hydrastic');
+				$output->writeln($this->dic['conf']['command_prefix'].' I created a shorcut for you : you can now run me with <info>./hydrastic</info>, assuming PHP binary is accessible from your ENV.');
 			}
 
 		} else {

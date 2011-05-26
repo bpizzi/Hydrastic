@@ -1,6 +1,6 @@
 <?php 
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,7 +10,7 @@
  */
 
 
-namespace Hydra;
+namespace Hydrastic;
 
 use \SplObjectStorage;
 
@@ -91,7 +91,7 @@ class Taxon
 
 	public function addChild($child) 
 	{
-		if (false === is_a($child, "Hydra\Taxon")) {
+		if (false === is_a($child, "Hydrastic\Taxon")) {
 			throw new \Exception("\$taxon->addChild() except a Taxon object as first parameter.");
 		} 
 		$this->getChildren()->attach($child, $child->getName());
@@ -108,16 +108,16 @@ class Taxon
 
 	public function addPost($post)
 	{
-		if (false === is_a($post, "Hydra\Post")) {
-			throw new \Exception("addPost except a Hydra\Post object as a first argument");
+		if (false === is_a($post, "Hydrastic\Post")) {
+			throw new \Exception("addPost except a Hydrastic\Post object as a first argument");
 		}
 		$this->getPostStorage()->attach($post);
 	}
 
 	public function hasPost($post)
 	{
-		if (false === is_a($post, "Hydra\Post")) {
-			throw new \Exception("hasPost except a Hydra\Post object as a first argument");
+		if (false === is_a($post, "Hydrastic\Post")) {
+			throw new \Exception("hasPost except a Hydrastic\Post object as a first argument");
 		}
 		return $this->getPostStorage()->contains($post) ? true : false;
 	}

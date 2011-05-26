@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -9,7 +9,7 @@
  *
  */
 
-namespace Hydra;
+namespace Hydrastic;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -22,7 +22,7 @@ use \SplObjectStorage;
  * A Taxon is a parent family with children ("A taxon", "Two taxa")
  * Each child can be a taxon with or without children.
  *
- * Taxonomy in Hydra accept unlimited levels of classification :
+ * Taxonomy in Hydrastic accept unlimited levels of classification :
  *   Categories:
  *     First Categorie:
  *       Sub-Categorie for first categorie;
@@ -165,7 +165,7 @@ class Taxonomy
 				//echo $taxon->getName() ." has ".$taxon->getChildrenNumber()." children \n";
 				$levelUp = $level + 1;
 				$deepSearch = $this->retrieveTaxonFromName($taxonName, $taxon->getChildren(), $levelUp);
-				if (is_a($deepSearch, "Hydra\Taxon")) {
+				if (is_a($deepSearch, "Hydrastic\Taxon")) {
 					return $deepSearch;
 				}
 			}

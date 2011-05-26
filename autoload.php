@@ -6,10 +6,10 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
-    'Symfony' => __DIR__.'/vendor',
-    'Hydra'   => __DIR__.'/src',
+	'Symfony' => __DIR__.'/vendor',
+	'Hydrastic'   => __DIR__.'/src',
 ));
 $loader->registerPrefixes(array(
-    'Pimple' => __DIR__.'/vendor/pimple/lib',
+	'Pimple' => __DIR__.'/vendor/pimple/lib',
 ));
 $loader->register();

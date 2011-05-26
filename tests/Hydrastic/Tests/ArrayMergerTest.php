@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,7 +10,7 @@
  */
 
 
-use Hydra\Util\ArrayMerger;
+use Hydrastic\Util\ArrayMerger;
 
 class ArrayMergerTest extends PHPUnit_Framework_TestCase
 {

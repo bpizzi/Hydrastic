@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,7 +10,7 @@
  */
 
 
-namespace Hydra\Service;
+namespace Hydrastic\Service;
 
 use Pimple;
 
@@ -19,7 +19,7 @@ class Twig extends Pimple
 
 	public function __construct($c) {
 
-		require_once $c['hydra_dir'].'/vendor/twig/lib/Twig/Autoloader.php';
+		require_once $c['hydrastic_dir'].'/vendor/twig/lib/Twig/Autoloader.php';
 
 		\Twig_Autoloader::register();
 

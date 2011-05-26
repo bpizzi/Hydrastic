@@ -1,7 +1,7 @@
-Hydra
+Hydrastic
 =====
 
-Hydra aims to be a static website generator.
+Hydrastic aims to be a static website generator.
 Work is still under HEAVY DEVELOPMENT.
 
 Inspiration

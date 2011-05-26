@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,9 +10,9 @@
  */
 
 
-use Hydra\Taxon;
-use Hydra\Service\Yaml as YamlService;
-use Hydra\Service\Util as UtilService;
+use Hydrastic\Taxon;
+use Hydrastic\Service\Yaml as YamlService;
+use Hydrastic\Service\Util as UtilService;
 
 class TaxonTest extends PHPUnit_Framework_TestCase
 {

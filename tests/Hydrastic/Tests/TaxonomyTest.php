@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,12 +10,12 @@
  */
 require_once 'vfsStream/vfsStream.php';
 
-use Hydra\Taxonomy;
-use Hydra\Post;
-use Hydra\Service\Yaml as YamlService;
-use Hydra\Service\Finder as FinderService;
-use Hydra\Service\Util as UtilService;
-use Hydra\Service\Twig as TwigService;
+use Hydrastic\Taxonomy;
+use Hydrastic\Post;
+use Hydrastic\Service\Yaml as YamlService;
+use Hydrastic\Service\Finder as FinderService;
+use Hydrastic\Service\Util as UtilService;
+use Hydrastic\Service\Twig as TwigService;
 
 class TaxonomyTest extends PHPUnit_Framework_TestCase
 {
@@ -33,9 +33,9 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
 		$this->dic['twig']   = $this->dic->share(function ($c) { return new TwigService($c); });
-		$this->dic['hydra_dir'] = __DIR__.'/../../../';
+		$this->dic['hydrastic_dir'] = __DIR__.'/../../../';
 
-		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydra-conf-1.yml')); 
+		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml')); 
 
 	}
 
@@ -63,7 +63,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 			)
 		);
 		$result = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'taxonomy-1.yml')); 
-		$this->assertEquals($expected, $result, "Correctly parsing taxonomy from hydra-conf");
+		$this->assertEquals($expected, $result, "Correctly parsing taxonomy from hydrastic-conf");
 	}
 
 	/**
@@ -79,10 +79,10 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		$this->assertFalse($this->dic['taxonomy']->retrieveTaxonFromName("The Unknown Taxon"), "An unknown taxon shouldn't be found by retrieveTaxonFromName()");
 
-		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Cat"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Cat')");
-		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subtag2"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subtag2')");
-		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subcat1"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subcat1')");
-		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Subtag1"), "Hydra\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Subtag1')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Cat"), "Hydrastic\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Cat')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subtag2"), "Hydrastic\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subtag2')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Elem1Subcat1"), "Hydrastic\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Elem1Subcat1')");
+		$this->assertTrue(is_a($this->dic['taxonomy']->retrieveTaxonFromName("Subtag1"), "Hydrastic\Taxon"), "A Hydra\Taxon object should be found by retrieveTaxonFromName('Subtag1')");
 
 	}
 
@@ -131,14 +131,14 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 	{
 		//Mocking the filesystem
 		vfsStreamWrapper::register();
-		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydraRoot'));
+		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydrasticRoot'));
 
 		//Quickly testing if vfsStream works well... just to be sure...
-		mkdir(vfsStream::url('hydraRoot/www'));
+		mkdir(vfsStream::url('hydrasticRoot/www'));
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
 
 
-		$this->dic['working_directory'] = vfsStream::url('hydraRoot');
+		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
@@ -158,11 +158,11 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 			->hydrate()
 			->attachToTaxonomy();
 
-		$this->dic['working_directory'] = vfsStream::url('hydraRoot'); //Returning to vfsStream
+		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot'); //Returning to vfsStream
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
-		$this->assertTrue(file_exists(vfsStream::url('hydraRoot/www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
-		//$this->assertTrue(file_exists(vfsStream::url('hydraRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
+		$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
+		//$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
 
 	}
 }

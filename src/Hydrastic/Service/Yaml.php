@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydra package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
@@ -10,7 +10,7 @@
  */
 
 
-namespace Hydra\Service;
+namespace Hydrastic\Service;
 
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Dumper;
