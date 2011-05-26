@@ -1,0 +1,28 @@
+Stuff being implemented.
+
+Functionnal
+- Parsing content with Textile, Markdown, ReStructuredText and Liquid
+- Helpers ( Link / Menu / Asset / Breadcrumbs )
+- RSS
+- Sitemap
+- Multilingual
+- Routing (categories / tag)
+- widgets (categories, tags, links, facebook, twitter, etc)
+- Google Analytics
+- Google Webmaster Toolkit
+- Generating a temporary index.html "Website is being updated" for live updates
+- Migration script from well known CMS
+
+Internal 
+- Unit tests
+- Functionnal tests
+- Assetic for assets
+- Compass for CSS
+- use Monolog to log objects behavior (whether than useless //echo)
+- Integrated webserver for live-viewing
+- Comments.php for commenting pages (comments.js frontside)
+- Metadata parser: let the user know when he's not using an official metadata
+
+Doc
+- Howto run on linux/mac/windows
+- Typical create/write/publish loop
