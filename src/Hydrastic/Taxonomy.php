@@ -154,7 +154,7 @@ class Taxonomy
 		}
 		$taxonStorage->rewind();
 
-		while($taxonStorage->valid()) {
+		while ($taxonStorage->valid()) {
 			$taxon = $taxonStorage->current();
 			//echo $taxon->getName()." at level ".$taxon->getLevel()." - \n";
 			if ($taxon->getName() === $taxonName) {
@@ -222,6 +222,17 @@ class Taxonomy
 		return $this;
 	}
 
+	/**
+	 * Recursively goes threw $taxonStorage, loop over taxa, and :
+	 *  - create the corresponding folder in www_dir (according to its slug)
+	 *  - retrieve posts affected to the current taxon and write them in that folder
+	 *  - write down a taxon index.html file
+	 *  - calls itself on $taxon->children if its necessary
+	 * 
+	 * @param SplObjectStorage $taxonStorage If null, use $this->getTaxonStorage()
+	 * @param string $path The path to the current taxon (folders hierarchie between working_directory and the taxon folder)
+	 * @param int $level The current recursivity level
+	 **/
 	public function createDirectoryStruct($taxonStorage = null, $path = null, $level = 0) {
 
 		$baseDir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'];
@@ -238,10 +249,13 @@ class Taxonomy
 
 		$taxonStorage->rewind();
 
-		while($taxonStorage->valid()) {
+		while ($taxonStorage->valid()) {
 			$taxon = $taxonStorage->current();
 
-			if ($taxon->getName() != '') {
+			//$this->initiateTaxonStorage(), in its current implementation, generates in known circumstances
+			//some taxon "artifacts" (ie. transient level between parent and children that should not exist, with blank names).
+			//Until correcting the init algo, we avoid parsing those levels by checking if it has a name.
+			if ($taxon->getName() != '') { 
 
 				$dir = $levelDir.'/'.$taxon->getSlug();
 
@@ -257,6 +271,7 @@ class Taxonomy
 					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
 				}
 
+				//Looping over the post of the taxon and write them to disc in the taxon folder
 				if ($taxon->hasPosts()) {
 					$postStorage = $taxon->getPostStorage();
 					$postStorage->rewind();
@@ -273,12 +288,15 @@ class Taxonomy
 
 			}
 
+			//Preparing the new folder path for the next recursivity call, if needed
 			if ($taxon->hasChildren() && $taxon->getName() != "") {
 				$childPath = $path.'/'.$taxon->getSlug();
 			} else {
 				$childPath = $path;
 			}
 
+			//Call createDirectoryStruct on $taxon's children, if needed, 
+			//with the path to the current taxon and the next recursivity leve
 			if ($taxon->hasChildren()) {
 				$childLevel = $level + 1;
 				$this->createDirectoryStruct($taxon->getChildren(), $childPath, $childLevel);
