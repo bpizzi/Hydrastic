@@ -132,37 +132,46 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		//Mocking the filesystem
 		vfsStreamWrapper::register();
 		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydrasticRoot'));
+		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
 
 		//Quickly testing if vfsStream works well... just to be sure...
 		mkdir(vfsStream::url('hydrasticRoot/www'));
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
 
+		//Load templates in mocked filesystem 
+		vfsStream::newDirectory('tpl')->at(vfsStreamWrapper::getRoot());
+		foreach ($this->dic['finder']['find']->files()->in($this->fixDir.'tpl/')->name('*.twig') as $f) {
+			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl'));
+		}
 
-		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
-		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
-		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat'), "cat/ should have been created by createDirectoryStruct()");
-		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat/cat1'), "cat/cat1 should have been created by createDirectoryStruct()");
-		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/elem1subtag1'), "tag/Subtag1/Elem1Subtag1 should have been created by createDirectoryStruct()");
-		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/subtag2/elem1subtag2'), "Avoiding path bug in recursivity : tag/subtag1/subtag2/elem1subtag2 shouldn't exist");
-
-
+		//Read a post, hydrate it, and attach it to the general taxonomy (ie. to each known taxon it's referring to in its metadatas)
 		$post = new Post($this->dic);
-		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-1.txt')));
-		$this->dic['working_directory'] = $this->fixDir; //Allows $post->hydrate() to find twig template
-		$post->read($file)
+		$post->read($this->fixDir.'txt/post-1.txt')
 			->clean()
 			->parseMetas()
 			->parseContent()
 			->hydrate()
 			->attachToTaxonomy();
 
-		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot'); //Returning to vfsStream
-		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
+
+		//Test that folders matching the taxonomy has been created
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat'), "cat/ should have been created by createDirectoryStruct()");
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat/cat1'), "cat/cat1 should have been created by createDirectoryStruct()");
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/elem1subtag1'), "tag/Subtag1/Elem1Subtag1 should have been created by createDirectoryStruct()");
+		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/subtag2/elem1subtag2'), "Avoiding path bug in recursivity : tag/subtag1/subtag2/elem1subtag2 shouldn't exist");
+
+		//test that text files were converted to html file in their own folders
 		$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
-		//$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
+		$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
+
+		//test that an index.html file with a list of posts has been created in each taxonomy folder
+		$taxon = $this->dic['taxonomy']->retrieveTaxonFromName("Tag2");
+		$this->assertRegExp('/- Title/', $taxon->getHtml());
+		$this->assertRegExp("/Posts classified under 'Tag2'/", $taxon->getHtml());
+ 
 
 	}
 }

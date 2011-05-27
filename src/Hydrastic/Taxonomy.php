@@ -286,6 +286,12 @@ class Taxonomy
 					}
 				}
 
+				//Hydrating and writing the taxon index.html file
+				$taxon->hydrateIndexFile()->writeIndexFile($dir);
+				if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Writed index.html for <info>$taxon</info>.");
+				}
+
 			}
 
 			//Preparing the new folder path for the next recursivity call, if needed
@@ -304,10 +310,6 @@ class Taxonomy
 
 			$taxonStorage->next();
 		}
-
-	}
-
-	public function writeToDisc() {
 
 	}
 

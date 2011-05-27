@@ -22,25 +22,15 @@ class Post
 {
 
 	protected $dic = array();
-
 	protected $filepath = array();
-
 	protected $rawData;
-
 	protected $fileArray = array();
-
 	protected $wwwFile;
-
 	protected $finalWwwFile;
-
 	protected $slug;
-
 	protected $metadatas = array();
-
 	protected $taxonomy = array();
-
 	protected $output = null;
-
 	protected $taxonStorage;
 
 	/**
@@ -79,6 +69,14 @@ class Post
 		return $this->filepath;
 	}
 
+	public function getMetadata($key)
+	{
+		if (false === array_key_exists($key, $this->metadatas["General"])) {
+			throw new \Exception("You try to access a metadata named $key which is not defined");
+		}
+
+		return $this->metadatas["General"][$key];
+	}
 	public function getMetadatas()
 	{
 		return $this->metadatas;
@@ -110,6 +108,14 @@ class Post
 		return $this->finalWwwFilename;
 	}
 
+	public function setHtml($html)
+	{
+		$this->html = $html;
+	}
+	public function getHtml()
+	{
+		return $this->html;
+	}
 	public function getTaxonomy() 
 	{
 		return $this->taxonomy;
@@ -168,13 +174,12 @@ class Post
 	 */
 	public function read($file)
 	{
-		if (file_exists($file)) {
-			$this->setFilepath($file);
-			$this->wwwFile = reset(explode('.', end(explode('/',$file->getRealPath()))));
-			$this->writeOutput($this->dic['conf']['command_prefix'].' Processing file <comment>'.$this->wwwFile.' ('.$file.')</comment>');
-		} else {
-			throw new \Exception();
-		}
+		if (false === file_exists($file)) {
+			throw new \Exception("\$post->read() except a valid readable file as first parameter");
+		} 
+		$this->setFilepath($file);
+		$this->wwwFile = reset(explode('.', end(explode('/',$file))));
+		$this->writeOutput($this->dic['conf']['command_prefix'].' Processing file <comment>'.$this->wwwFile.' ('.$file.')</comment>');
 
 		return $this;
 	}
@@ -203,6 +208,10 @@ class Post
 	{
 		// Get the metadatas
 		$metaDatasStr =  implode(chr(13), array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
+
+		if ( "" === $metaDatasStr) {
+			throw new \Exception("No metadata found in ".$this->getFilepath());
+		}
 
 		// Parse the metadatas in a array, using defaults when necessary
 		$this->setMetadatas($this->dic['yaml']['parser']->parse($metaDatasStr));
@@ -268,10 +277,10 @@ class Post
 			}
 			$this->writeOutput($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
 		}
-		$this->html = $this->dic['twig']['parser']->render(
+		$this->setHtml($this->dic['twig']['parser']->render(
 			$this->metadatas['General']['template'].'.twig',
 			array_merge($this->metadatas['General'], array("content" => $this->content))
-		); 
+		)); 
 
 		return $this;
 	}
@@ -279,7 +288,7 @@ class Post
 	public function attachToTaxonomy() 
 	{
 		if (false === isset($this->dic['taxonomy']) || false === $this->dic['taxonomy']->isInitiated()) {
-			throw new \Exception("You tried to attach a post to the general Taxonomy before having initiated it");
+			throw new \Exception("You tried to attach post '".$this->getFilepath()."' to the general Taxonomy before having initiated it");
 		}
 
 		if (false === is_string($this->metadatas['General']['title'])) {
@@ -314,8 +323,8 @@ class Post
 		$fileToWrite = $path.'/'.$this->finalWwwFilename;
 
 		// Write the html
-		file_put_contents($fileToWrite, $this->html);
-		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->html) {
+		file_put_contents($fileToWrite, $this->getHtml());
+		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->getHtml()) {
 			$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>'.str_replace(__DIR__.'/', '', $this->finalWwwFilename).'</comment>');
 			//echo "\n written $fileToWrite\n";
 			return true;

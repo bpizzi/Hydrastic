@@ -25,12 +25,17 @@ class Taxon
 	protected $level;
 	protected $children;
 	protected $postStorage;
+	protected $html;
+	protected $output = null;
 
 	public function __construct($dic)
 	{
 		$this->dic = $dic;
 		$this->setChildren(new SplObjectStorage());
 		$this->setPostStorage(new SplObjectStorage());
+		if (isset($dic["output"])) {
+			$this->output = $dic['output'];
+		}
 	}
 
 	public function __toString() 
@@ -38,6 +43,11 @@ class Taxon
 		return $this->getName();
 	}
 
+	public function writeOutput($msg) {
+		if (false === is_null($this->output)) {
+			$this->output->writeln($msg);
+		}
+	}
 	public function setPostStorage($postStorage) 
 	{
 		$this->postStorage = $postStorage;
@@ -71,6 +81,14 @@ class Taxon
 		return $this->slug; 
 	}
 
+	public function setHtml($html)
+	{
+		$this->html = $html;
+	}
+	public function getHtml()
+	{
+		return $this->html;
+	}
 	public function setLevel($level) { 
 		$this->level = $level; 
 	}
@@ -133,5 +151,69 @@ class Taxon
 	public function getPostsNumber()
 	{
 		return $this->getPostStorage()->count();
+	}
+
+	/**
+	 * Creates the HTML for the index file of the taxon.
+	 * Uses a twig template from tpl_dir
+	 **/
+	public function hydrateIndexFile() 
+	{
+		//Choosing which template to use
+		$template = "taxon.twig";
+
+		$posts = array();
+		$this->getPostStorage()->rewind();
+		while ($this->getPostStorage()->valid()) {
+			$p = $this->getPostStorage()->current();
+			$posts[] = array(
+				"title" => $p->getMetadata("title"),
+				"slug" => $p->getSlug(),
+			);
+			$this->getPostStorage()->next();
+		}
+
+		$children = array();
+		$this->getChildren()->rewind();
+		while ($this->getChildren()->valid()) {
+			$c = $this->getChildren()->current();
+			$children[] = array(
+				"name" => $c->getName(),
+				"slug" => $c->getSlug(),
+			);
+			$this->getChildren()->next();
+		}
+
+		$this->setHtml($this->dic['twig']['parser']->render(
+			$template,
+			array(
+				"posts" => $posts,
+				"children" => $children,
+				"taxonName" => $this->getName(),
+				"taxonSlug" => $this->getSlug(),
+			)
+		)); 
+
+		return $this;
+	}
+
+	public function writeIndexFile($path)
+	{
+		if (null === $this->getHtml()) {
+			throw new \Exception("You called \$taxon->writeIndexFile() without having called \$taxon->hydrateIndexFile() before");
+		}
+
+		$fileToWrite = $path.'/index.html';
+
+		// Write the html
+		file_put_contents($fileToWrite, $this->getHtml());
+		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->getHtml()) {
+			$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
+			return true;
+		}
+
+		$this->writeOutput($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
+
+		return false;
 	}
 }

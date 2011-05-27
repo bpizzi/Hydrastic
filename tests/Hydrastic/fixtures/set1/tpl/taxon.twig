@@ -1,0 +1,11 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+	<h1>Posts classified under '{{ taxonName }}'</h1>
+
+	<ul>
+	{% for post in posts %}
+		<li>- {{ post.title|e }}</li>
+	{% endfor %}
+	</ul>
+{% endblock %}
