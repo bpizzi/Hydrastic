@@ -14,6 +14,7 @@ Functionnal
 - Compass for CSS
 - Assetic for assets
 - Comments.php for commenting pages (comments.js frontside)
+- A standard set of template files
 
 Internal 
 - Unit tests

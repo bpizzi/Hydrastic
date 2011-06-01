@@ -115,10 +115,36 @@ class Taxon
 		$this->getChildren()->attach($child, $child->getName());
 	}
 
+	public function hasChildByName($childname)
+	{
+		$this->getChildren()->rewind();
+		while ($this->getChildren()->valid()) {
+			$c = $this->getChildren()->current();
+			//echo "Testing $childname === ".$c->getName()." \n";
+			if ($childname === $c->getName()) {
+				return true;
+			}
+			$this->getChildren()->next();
+		}
+		return false;
+	}
+
+	public function hasChild($childObject)
+	{
+		if (false === is_a($childObject, "Hydrastic\Taxon")) {
+			throw new \Exception("hasChild except a Hydrastic\Taxon object as a first argument");
+		}
+		if ($this->getChildren()->contains($childObject)) {
+			return true;
+		}
+		return false;
+	}
+
 	public function getChildrenNumber() 
 	{
 		return $this->getChildren()->count();
 	}
+
 	public function hasChildren()
 	{
 		return $this->getChildrenNumber() > 0 ? true : false;
@@ -189,8 +215,7 @@ class Taxon
 			array(
 				"posts" => $posts,
 				"children" => $children,
-				"taxonName" => $this->getName(),
-				"taxonSlug" => $this->getSlug(),
+				"taxon" => $this,
 			)
 		)); 
 

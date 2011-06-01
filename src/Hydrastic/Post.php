@@ -209,10 +209,6 @@ class Post
 		// Get the metadatas
 		$metaDatasStr =  implode(chr(13), array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
 
-		if ( "" === $metaDatasStr) {
-			throw new \Exception("No metadata found in ".$this->getFilepath());
-		}
-
 		// Parse the metadatas in a array, using defaults when necessary
 		$this->setMetadatas($this->dic['yaml']['parser']->parse($metaDatasStr));
 
@@ -288,7 +284,7 @@ class Post
 	public function attachToTaxonomy() 
 	{
 		if (false === isset($this->dic['taxonomy']) || false === $this->dic['taxonomy']->isInitiated()) {
-			throw new \Exception("You tried to attach post '".$this->getFilepath()."' to the general Taxonomy before having initiated it");
+			throw new \Exception("You tried to attach a post to the general Taxonomy before having initiated it");
 		}
 
 		if (false === is_string($this->metadatas['General']['title'])) {

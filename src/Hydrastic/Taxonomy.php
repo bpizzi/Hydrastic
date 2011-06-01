@@ -107,7 +107,7 @@ class Taxonomy
 			//echo "New parent : $parentName, level $level\n";
 			$subParent = new Taxon($this->dic);
 			if (is_int($parentName)) {
-				$subParent->setName(null);
+				$subParent->setName($child);
 			} else {
 				$subParent->setName($parentName);
 			}
@@ -118,11 +118,11 @@ class Taxonomy
 
 			if (is_array($child)) {
 				//If the taxon as children
-				//echo "Going into deep init for ".sizeof($child)." children of : $parentName\n";
+				//echo "  Going into deep init for ".sizeof($child)." children of : $parentName\n";
 				$this->initiateTaxonStorage($child, &$subParent, $level); 
 			} else {
-				//echo "New child : $child, level 1\n";
 				$newChildLevel = $level + 1;
+				//echo "  New child : $child, level $newChildLevel\n";
 				$newChild = new Taxon($this->dic);
 				$newChild->setName($child);
 				$newChild->setLevel($newChildLevel);
@@ -182,7 +182,7 @@ class Taxonomy
 
 	}
 
-	public function cleanWwwDir() 
+	public function cleanWwwDir($force = false) 
 	{
 		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/*';
 
@@ -206,17 +206,26 @@ class Taxonomy
 
 		$cmd .= $dir;
 
-		if (isset($this->dic['output'])) {
-			$this->dic['output']->writeln('---');
-			$dialog = new DialogHelper();
-			$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' I need to clean the www directory, but I request your permission before deleting anything on your filesystem :');
-			$question = $this->dic['conf']['command_prefix']." Do you allow me to run '<comment>".$cmd."</comment>' (recursively delete everything in that folder)  ? (<info>y/n</info>)";
-			if (true === $dialog->askConfirmation($this->dic['output'], $question, false)) {
-				system($cmd);
-				$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Ran <comment>$cmd</comment>.");
-			} else {
-				$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Didn't cleaned www directory, you should see some warnings... ");
+		$runCmd = false;
+		if ($force) {
+			$runCmd = true;
+		} else {
+			if (isset($this->dic['output'])) { //What if we run cleanWwwDir without $output initiated ? ==> gonna take care of it later ;)
+				$this->dic['output']->writeln('---');
+				$dialog = new DialogHelper();
+				$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' I need to clean the www directory, but I request your permission before deleting anything on your filesystem :');
+				$question = $this->dic['conf']['command_prefix']." Do you allow me to run '<comment>".$cmd."</comment>' (recursively delete everything in that folder)  ? (<info>y/n</info>)";
+				if (true === $dialog->askConfirmation($this->dic['output'], $question, false)) {
+					$runCmd = true;
+				} 
 			}
+		}
+
+		if($runCmd) {
+			system($cmd);
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Ran <comment>$cmd</comment>.");
+		} else {
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Didn't cleaned www directory, you should see some warnings... ");
 		}
 
 		return $this;
@@ -233,84 +242,111 @@ class Taxonomy
 	 * @param string $path The path to the current taxon (folders hierarchie between working_directory and the taxon folder)
 	 * @param int $level The current recursivity level
 	 **/
-	public function createDirectoryStruct($taxonStorage = null, $path = null, $level = 0) {
+		public function createDirectoryStruct($taxonStorage = null, $path = null, $level = 0) {
 
-		$baseDir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'];
-		if (null === $taxonStorage) {
-			$taxonStorage = $this->getTaxonStorage();
-		}
-
-		if (null === $path || $level == 0) {
-			$levelDir = $baseDir;
-			$path = '';
-		} else {
-			$levelDir = $baseDir.$path;
-		}
-
-		$taxonStorage->rewind();
-
-		while ($taxonStorage->valid()) {
-			$taxon = $taxonStorage->current();
-
-			//$this->initiateTaxonStorage(), in its current implementation, generates in known circumstances
-			//some taxon "artifacts" (ie. transient level between parent and children that should not exist, with blank names).
-			//Until correcting the init algo, we avoid parsing those levels by checking if it has a name.
-			if ($taxon->getName() != '') { 
-
-				$dir = $levelDir.'/'.$taxon->getSlug();
-
-				//$tab = "";
-				//for ($i = 0; $i < $level; $i++) {
-				//$tab .= "  ";
-				//}
-				//echo "\n$tab-'".$taxon->getName()."' ===> path = $path   /   dir = $dir\n";
-
-				mkdir($dir);
-
-				if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
-					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
-				}
-
-				//Looping over the post of the taxon and write them to disc in the taxon folder
-				if ($taxon->hasPosts()) {
-					$postStorage = $taxon->getPostStorage();
-					$postStorage->rewind();
-
-					while ($postStorage->valid()) {
-						$post = $postStorage->current();
-						$post->writeToFile($dir);
-						if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
-							$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Filled <info>$taxon</info> with <info>$post</info>.");
-						}
-						$postStorage->next();
-					}
-				}
-
-				//Hydrating and writing the taxon index.html file
-				$taxon->hydrateIndexFile()->writeIndexFile($dir);
-				if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
-					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Writed index.html for <info>$taxon</info>.");
-				}
-
+			$baseDir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'];
+			if (null === $taxonStorage) {
+				$taxonStorage = $this->getTaxonStorage();
 			}
 
-			//Preparing the new folder path for the next recursivity call, if needed
-			if ($taxon->hasChildren() && $taxon->getName() != "") {
-				$childPath = $path.'/'.$taxon->getSlug();
+			if (null === $path || $level == 0) {
+				$levelDir = $baseDir;
+				$path = '';
 			} else {
-				$childPath = $path;
+				$levelDir = $baseDir.$path;
 			}
 
-			//Call createDirectoryStruct on $taxon's children, if needed, 
-			//with the path to the current taxon and the next recursivity leve
-			if ($taxon->hasChildren()) {
-				$childLevel = $level + 1;
-				$this->createDirectoryStruct($taxon->getChildren(), $childPath, $childLevel);
-			}
+			$taxonStorage->rewind();
 
-			$taxonStorage->next();
+			while ($taxonStorage->valid()) {
+				$taxon = $taxonStorage->current();
+
+				//$this->initiateTaxonStorage(), in its current implementation, generates in known circumstances
+				//some taxon "artifacts" (ie. transient level between parent and children that should not exist, with blank names).
+				//Until correcting the init algo, we avoid parsing those levels by checking if it has a name.
+				if ($taxon->getName() != '') { 
+
+					$dir = $levelDir.'/'.$taxon->getSlug();
+
+					//$tab = "";
+					//for ($i = 0; $i < $level; $i++) {
+					//$tab .= "  ";
+					//}
+					//echo "\n$tab-'".$taxon->getName()."' ===> path = $path   /   dir = $dir\n";
+
+					mkdir($dir);
+
+					if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+						$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
 		}
 
-	}
+		//Looping over the post of the taxon and write them to disc in the taxon folder
+		if ($taxon->hasPosts()) {
+			$postStorage = $taxon->getPostStorage();
+			$postStorage->rewind();
 
-}
+			while ($postStorage->valid()) {
+				$post = $postStorage->current();
+				$post->writeToFile($dir);
+				if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Filled <info>$taxon</info> with <info>$post</info>.");
+		}
+		$postStorage->next();
+		}
+		}
+
+		//Hydrating and writing the taxon index.html file
+		$taxon->hydrateIndexFile()->writeIndexFile($dir);
+		if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Writed index.html for <info>$taxon</info>.");
+		}
+
+		}
+
+		//Preparing the new folder path for the next recursivity call, if needed
+		if ($taxon->hasChildren() && $taxon->getName() != "") {
+			$childPath = $path.'/'.$taxon->getSlug();
+		} else {
+			$childPath = $path;
+		}
+
+		//Call createDirectoryStruct on $taxon's children, if needed, 
+		//with the path to the current taxon and the next recursivity leve
+		if ($taxon->hasChildren()) {
+			$childLevel = $level + 1;
+			$this->createDirectoryStruct($taxon->getChildren(), $childPath, $childLevel);
+		}
+
+		$taxonStorage->next();
+		}
+
+		}
+
+
+		public function hydrateIndexFile()
+		{
+
+		}
+
+		public function writeIndexFile() 
+		{
+
+			if (null === $this->getHtml()) {
+				throw new \Exception("You called \$taxon->writeIndexFile() without having called \$taxon->hydrateIndexFile() before");
+		}
+
+		$fileToWrite = $path.'/index.html';
+
+		// Write the html
+		file_put_contents($fileToWrite, $this->getHtml());
+		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->getHtml()) {
+			$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
+			return true;
+		}
+
+		$this->writeOutput($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
+
+		return false;
+
+		}
+		}

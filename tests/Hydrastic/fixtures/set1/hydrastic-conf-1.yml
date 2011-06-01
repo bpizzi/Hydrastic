@@ -14,7 +14,7 @@ Taxonomy:
     Cat:
         Cat1:
             Subcat1:
-                - Elem1Subcat1
+                Elem1Subcat1:
                 - Elem2Subcat1
         Cat2:
             - ElemCat2

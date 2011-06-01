@@ -40,7 +40,9 @@ class Process extends SymfonyCommand
 	{
 		$this
 			->setName('hydrastic:process')
-			->setDefinition(array())
+			->setDefinition(array(
+				new InputOption('f', '', InputOption::VALUE_NONE, 'Force recursive cleaning of the www dir'),
+			))
 			->setDescription('Generate your website')
 			->setHelp(<<<EOF
 The <info>hydrastic:process</info> command generate your website !
@@ -77,7 +79,12 @@ EOF
 
 		} //-- parsing content files
 
-		$taxonomy->cleanWwwDir()->createDirectoryStruct();
+		if ($input->getOptions('f')) {
+			$taxonomy->cleanWwwDir(true);
+		} else {
+			$taxonomy->cleanWwwDir();
+		}
+		$taxonomy->createDirectoryStruct();
 
 		$output->writeln('----->');
 
