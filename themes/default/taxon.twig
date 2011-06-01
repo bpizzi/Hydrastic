@@ -1,0 +1,19 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+	<a href="/">Home</a><br />
+	<h4>Subcategories</h4>
+	<ul>
+	{% for child in children %}
+		<li><a href="{{ child.slug|raw }}">{{ child.slug|raw }}</a></li>
+	{% endfor %}
+	</ul>
+
+	<h1>Posts classified under '{{ taxon.name }}'</h1>
+
+	<ul>
+	{% for post in posts %}
+		<li><a href="{{ post.slug|raw }}.html">{{ post.title|raw }}</a></li>
+	{% endfor %}
+	</ul>
+{% endblock %}

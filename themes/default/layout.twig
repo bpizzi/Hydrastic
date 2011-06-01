@@ -1,0 +1,26 @@
+<!doctype html>  
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>{% block title %}Default site title{% endblock %}</title>
+	<meta name="description" content="{% block metadesc %}Default site description{% endblock %}">
+	<meta name="metakeys" content="{% block metakeys %}Default site metakeys{% endblock %}">
+	<meta name="author" content="{% block author %}Default site author{% endblock %}">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<div id="container">
+	<header>
+		{% block header %}Default header{% endblock %}
+	</header>
+
+	<div id="main">
+		{% block content %}Content placeholder{% endblock %}
+	</div>
+
+	<footer>
+		{% block footer %}Default footer{% endblock %}
+	</footer>
+	</div> <!--! end of #container -->
+</body>
+</html>
