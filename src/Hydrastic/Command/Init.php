@@ -40,7 +40,9 @@ class Init extends SymfonyCommand
 	{
 		$this
 			->setName('hydrastic:init')
-			->setDefinition(array())
+			->setDefinition(array(
+				new InputOption('f', '', InputOption::VALUE_NONE, 'Force deletion of current config and installation of default theme'),
+				))
 			->setDescription('Initiate folder structure and config file')
 			->setHelp(<<<EOF
 The <info>hydrastic:init</info> command checks if the current directory could be used for holding your txt/twig/html files.
@@ -78,12 +80,18 @@ EOF
 
 			//Foreach folder we found, ask which type of file it should be used for
 			foreach ($f as $d) {
-				$question = $this->dic['conf']['command_prefix']." <comment>".$d->getRelativePathname()."</comment> folder found, shall I use it for :\n"
-					."        1) Holding text files (answer <info>txt</info>)\n"
-					."        2) Holding template files (answer <info>tpl</info>)\n"
-					."        3) Holding generated html files (answer <info>www</info>)\n"
-					."        4) None (answer <info>none</info>)\n"
-					.">";
+				$question = $this->dic['conf']['command_prefix']." `<comment>".$d->getRelativePathname()."</comment>` folder found, shall I use it for :\n";
+				if (null === $folderConf['txt_dir']) {
+					$question .= "        [-->] Holding text files (answer <info>txt</info>)\n";
+				}
+				if (null === $folderConf['tpl_dir']) {
+					$question .= "        [-->] Holding template files (answer <info>tpl</info>)\n";
+				}
+				if (null === $folderConf['www_dir']) {
+					$question .= "        [-->] Holding generated html files (answer <info>www</info>)\n";
+				}
+				$question .= "        [-->] None (answer <info>none</info>)\n >";
+
 				$validate = function ($v) {
 					return in_array($v, array('txt', 'tpl', 'www', 'none')) ? $v : false;
 				};
