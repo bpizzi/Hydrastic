@@ -86,6 +86,8 @@ EOF
 		}
 		$taxonomy->createDirectoryStruct();
 
+		$taxonomy->hydrateIndexFile()->writeIndexFile($this->dic['working_directory'].'/'.$this->dic['conf']['www_dir']);
+
 		$output->writeln('----->');
 
 		$output->writeln($this->dic['conf']['command_prefix'].' Done.');

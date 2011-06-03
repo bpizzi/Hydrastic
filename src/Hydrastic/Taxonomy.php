@@ -54,6 +54,8 @@ class Taxonomy
 
 	protected $initiated;
 
+	protected $indexHtml;
+
 
 	/**
 	 * Constructs the Taxonomy object
@@ -66,6 +68,9 @@ class Taxonomy
 		$this->dic = $dic;
 		$this->setTaxonStorage(new SplObjectStorage());
 		$this->setInitiated(false);
+		if (isset($dic["output"])) {
+			$this->output = $dic['output'];
+		}
 	}
 
 	public function isInitiated() 
@@ -93,6 +98,19 @@ class Taxonomy
 		$this->taxonStorage->attach($taxon, $taxon->getName());
 	}
 
+	public function getIndexHtml()
+	{
+		return $this->indexHtml;
+	}
+	public function setIndexHtml($html)
+	{
+		$this->indexHtml = $html;
+	}
+	public function writeOutput($msg) {
+		if (false === is_null($this->output)) {
+			$this->output->writeln($msg);
+		}
+	}
 	/**
 	 * Go threw the taxonomy array (stored in the DIC), and initiate a tree of Taxon objects.
 	 * This function is recursive, and should be called the first time without args.
@@ -177,7 +195,6 @@ class Taxonomy
 			return false;
 		}
 	}
-
 	public function hydrateTaxa() {
 
 	}
@@ -278,75 +295,99 @@ class Taxonomy
 
 					if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
 						$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Created <info>$dir</info>.");
+					}
+
+					//Looping over the post of the taxon and write them to disc in the taxon folder
+					if ($taxon->hasPosts()) {
+						$postStorage = $taxon->getPostStorage();
+						$postStorage->rewind();
+
+						while ($postStorage->valid()) {
+							$post = $postStorage->current();
+							$post->writeToFile($dir);
+							if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+								$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Filled <info>$taxon</info> with <info>$post</info>.");
+							}
+							$postStorage->next();
+						}
+					}
+
+					//Hydrating and writing the taxon index.html file
+					$taxon->hydrateIndexFile()->writeIndexFile($dir);
+					if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
+						$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Writed index.html for <info>$taxon</info>.");
+					}
+
+				}
+
+				//Preparing the new folder path for the next recursivity call, if needed
+				if ($taxon->hasChildren() && $taxon->getName() != "") {
+					$childPath = $path.'/'.$taxon->getSlug();
+				} else {
+					$childPath = $path;
+				}
+
+				//Call createDirectoryStruct on $taxon's children, if needed, 
+				//with the path to the current taxon and the next recursivity leve
+				if ($taxon->hasChildren()) {
+					$childLevel = $level + 1;
+					$this->createDirectoryStruct($taxon->getChildren(), $childPath, $childLevel);
+				}
+
+				$taxonStorage->next();
+			}
+
 		}
 
-		//Looping over the post of the taxon and write them to disc in the taxon folder
-		if ($taxon->hasPosts()) {
-			$postStorage = $taxon->getPostStorage();
-			$postStorage->rewind();
 
-			while ($postStorage->valid()) {
-				$post = $postStorage->current();
-				$post->writeToFile($dir);
-				if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
-					$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Filled <info>$taxon</info> with <info>$post</info>.");
-		}
-		$postStorage->next();
-		}
-		}
-
-		//Hydrating and writing the taxon index.html file
-		$taxon->hydrateIndexFile()->writeIndexFile($dir);
-		if (isset($this->dic['output']) && $this->dic['output']->getVerbosity() === 2) {
-			$this->dic['output']->writeln($this->dic['conf']['command_prefix']." Writed index.html for <info>$taxon</info>.");
-		}
-
-		}
-
-		//Preparing the new folder path for the next recursivity call, if needed
-		if ($taxon->hasChildren() && $taxon->getName() != "") {
-			$childPath = $path.'/'.$taxon->getSlug();
-		} else {
-			$childPath = $path;
-		}
-
-		//Call createDirectoryStruct on $taxon's children, if needed, 
-		//with the path to the current taxon and the next recursivity leve
-		if ($taxon->hasChildren()) {
-			$childLevel = $level + 1;
-			$this->createDirectoryStruct($taxon->getChildren(), $childPath, $childLevel);
-		}
-
-		$taxonStorage->next();
-		}
-
-		}
-
-
+		/**
+		 * Hydrate the html for the root index file
+		 **/
 		public function hydrateIndexFile()
 		{
+			$firstLevelTaxa = array();
+			$this->getTaxonStorage()->rewind();
+			while($this->getTaxonStorage()->valid()) {
+				$taxon = $this->getTaxonStorage()->current();
+                $firstLevelTaxa[] = $taxon;
+				$this->getTaxonStorage()->next();
+			}
+
+			$this->setIndexHtml($this->dic['twig']['parser']->render(
+				'index.twig',
+				array(
+					"title" => "Hydra Accueil",
+					"taxa"  => $firstLevelTaxa,
+				)
+			)); 
+
+			return $this;
 
 		}
 
-		public function writeIndexFile() 
+		/**
+		 * Write the hydrated html to the specified path
+		 * @param string The path to the www directory
+		 **/
+		public function writeIndexFile($path) 
 		{
 
-			if (null === $this->getHtml()) {
+			if (null === $this->getIndexHtml()) {
 				throw new \Exception("You called \$taxon->writeIndexFile() without having called \$taxon->hydrateIndexFile() before");
+			}
+
+			$fileToWrite = $path.'/index.html'; //TODO: setting the index.html in the conf
+
+			// Write the html
+			file_put_contents($fileToWrite, $this->getIndexHtml());
+			if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->getIndexHtml()) {
+				$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated root <comment>index.html</comment>');
+				return true;
+			}
+
+			$this->writeOutput($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
+
+			return false;
+
 		}
-
-		$fileToWrite = $path.'/index.html';
-
-		// Write the html
-		file_put_contents($fileToWrite, $this->getHtml());
-		if (file_exists($fileToWrite) && file_get_contents($fileToWrite) == $this->getHtml()) {
-			$this->writeOutput($this->dic['conf']['command_prefix'].' Successfully hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
-			return true;
-		}
-
-		$this->writeOutput($this->dic['conf']['command_prefix'].' <error>ERROR</error> Failed hydrated <comment>index.html</comment> for taxon <comment>'.$this->getName().'</comment>');
-
-		return false;
-
-		}
-		}
+}

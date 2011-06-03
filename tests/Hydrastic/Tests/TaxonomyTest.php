@@ -176,9 +176,9 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/subtag2/elem1subtag2'), "Avoiding path bug in recursivity : tag/subtag1/subtag2/elem1subtag2 shouldn't exist");
 
 		$post = new Post($this->dic);
-		$postFile = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir.'txt/')->name('post-1.txt')));
-		echo "\n--post file : ".$postFile->getRealPath()."--\n";
-		$post->read($postFile->getRealPath())
+		//$postFile = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir.'txt/')->name('post-1.txt')));
+		//echo "\n--post file : ".$postFile->getRealPath()."--\n";
+		$post->read($this->fixDir.'txt/post-1.txt')
 			->clean()
 			->parseMetas()
 			->parseContent()
@@ -189,7 +189,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
-		$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
+		$this->assertTrue(file_exists(vfsStream::url('www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
 		$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
 
 

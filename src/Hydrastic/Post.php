@@ -149,7 +149,6 @@ class Post
 		$this->fileArray = $array;
 	}
 
-
 	public function hasTaxon($taxon)
 	{
 		if (true === is_a($taxon, "Hydrastic\Taxon")) {
@@ -175,7 +174,7 @@ class Post
 	public function read($file)
 	{
 		if (false === file_exists($file)) {
-			throw new \Exception("\$post->read() except a valid readable file as first parameter");
+			throw new \Exception("\$post->read() except a valid readable file as first parameter: $file isn't a valid file.");
 		} 
 		$this->setFilepath($file);
 		$this->wwwFile = reset(explode('.', end(explode('/',$file))));
