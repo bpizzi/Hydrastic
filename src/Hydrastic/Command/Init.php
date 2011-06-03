@@ -59,6 +59,27 @@ EOF
 	{
 		$dialog = new DialogHelper();
 
+		//If --f, backup existing config file (overwriting existing backup), and unset the current config file.
+		if ($this->dic['user_conf_defined'] && $input->getOptions('f')) {
+			$output->writeln($this->dic['conf']['command_prefix'].' I can see you already have a configuration file. I\'ve made a backup before deleting it.');
+			if (is_file($this->dic['working_directory'].'/hydrastic-conf.yml.backup')) {
+				unlink($this->dic['working_directory'].'/hydrastic-conf.yml.backup');
+			} 
+			file_put_contents(
+				$this->dic['working_directory'].'/hydrastic-conf-backup.yml',
+				file_get_contents($this->dic['working_directory'].'/hydrastic-conf.yml')
+			);
+			unlink($this->dic['working_directory'].'/hydrastic-conf.yml');
+
+		}
+
+		//If no --f and existing config : do nothing.
+		if ($this->dic['user_conf_defined']) {
+			$output->writeln($this->dic['conf']['command_prefix'].' I can see you already have a configuration file. Please make a backup and delete it before running me again.');
+			die();
+		}
+
+        //Proceed to config file creation
 		if (!$this->dic['user_conf_defined']) {
 			$output->writeln($this->dic['conf']['command_prefix'].' hydrastic-conf.yml not found, let\'s see if we can create one together.');
 
@@ -193,10 +214,7 @@ EOF
 				$output->writeln($this->dic['conf']['command_prefix'].' I created a shorcut for you : you can now run me with <info>./hydrastic</info>, assuming PHP binary is accessible from your ENV.');
 			}
 
-		} else {
-			$output->writeln($this->dic['conf']['command_prefix'].' I can see you already have a configuration file. Please make a backup and delete it before running me again.');
-		}//-- creation of a user config file
-
+		} 
 
 	}
 
