@@ -201,6 +201,12 @@ class Taxonomy
 
 	public function cleanWwwDir($force = false) 
 	{
+		if (file_exists($this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/hydrastic-conf.yml')) {
+			//Checking if hydrastic config file exist in www_dir: if yes, it could be that something is wrong
+			//and that we're not in www_dir.
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' Something look wrong: I can\'t access the www_dir, maybe you should ckeck your config file.');
+			die();
+		}
 		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/*';
 
 		switch (PHP_OS) {
