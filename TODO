@@ -11,10 +11,11 @@ Functionnal
 - Google Webmaster Toolkit
 - Generating a temporary index.html "Website is being updated" for live updates
 - Migration script from well known CMS
-- Compass for CSS
-- Assetic for assets
-- Comments.php for commenting pages (comments.js frontside)
-- A standard set of template files
+- Assets management: list of files to include (css/js) and post-processors (compass, js-min, etc)
+- Image management: processor+rules to apply to images (min, compress, etc)
+- Comments handling : Facebook comments / disq.us / Comments.php (comments.js frontside)
+- A default set of template files
+- Standard 404/50x page
 
 Internal 
 - Unit tests
