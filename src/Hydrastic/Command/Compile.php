@@ -93,7 +93,7 @@ EOF
 			'autoload.php',
 			'hydrastic-default-conf.yml',
 			'LICENSE',
-			'vendor/twig/lib/Twig/Compiler.php', //TODO: see why this file isn't loaded by $finder...
+			'vendor/twig/lib/Twig/Compiler.php', //TODO: see why this file isn't loaded by $finder... => UPDATE: because we told $finder not to, line 72...
 		);
 		foreach ($otherFiles as $file) {
 			$filepath = str_replace(realpath(__DIR__.'/../../..').'/', '', $file);
