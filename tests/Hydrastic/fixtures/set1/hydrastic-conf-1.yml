@@ -1,15 +1,18 @@
 version: 0.1
 command_prefix: <info>Hydrastic></info>
-General:
-  txt_dir: txt
-  tpl_dir: tpl
-  www_dir: www
-  www_file_extension: html
-  txt_file_extension: txt
+txt_dir: txt
+tpl_dir: tpl
+www_dir: www
+www_file_extension: html
+txt_file_extension: txt
+theme: default
+taxon_template: taxon.twig
+post_template: post.twig
 metadata_defaults:
-  title: Hydrastic 
-  description: Hydrastic is a static website generator
-  author: Baptiste Pizzighini
+  General:
+    title: Hydrastic 
+    description: Hydrastic is a static website generator
+    author: Baptiste Pizzighini
 Taxonomy:
     Cat:
         Cat1:

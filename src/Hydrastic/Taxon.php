@@ -186,7 +186,8 @@ class Taxon
 	public function hydrateIndexFile() 
 	{
 		//Choosing which template to use
-		$template = "taxon.twig";
+		//TODO: defining theme configuration in a theme config file
+		$template = $this->dic['conf']['taxon_template'];
 
 		$posts = array();
 		$this->getPostStorage()->rewind();

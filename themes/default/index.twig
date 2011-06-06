@@ -1,0 +1,12 @@
+{% extends 'layout.twig' %}
+{% block content %}
+	<a href="/">Home</a><br />
+	<h4>Subcategories</h4>
+	<ul>
+	{% for child in children %}
+		<li><a href="{{ child.slug|raw }}">{{ child.slug|raw }}</a></li>
+	{% endfor %}
+	</ul>
+	<h1>Home sweet home</h1>
+	<p>You'll find here a list of post</p>
+{% endblock %}

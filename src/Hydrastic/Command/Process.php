@@ -41,11 +41,12 @@ class Process extends SymfonyCommand
 		$this
 			->setName('hydrastic:process')
 			->setDefinition(array(
-				new InputOption('f', '', InputOption::VALUE_NONE, 'Force recursive cleaning of the www dir'),
+				new InputOption('f', '', InputOption::VALUE_NONE, 'Force recursive cleaning of the www dir - USE WITH CAUTION'),
 			))
 			->setDescription('Generate your website')
 			->setHelp(<<<EOF
 The <info>hydrastic:process</info> command generate your website !
+--f option force the recursive cleaning of your www directory: use it with caution (always backup template and content file as a good habit)
 EOF
 		);
 
@@ -60,7 +61,7 @@ EOF
 
 		$files = $this->dic['finder']['txt_files'];
 
-		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['General']['txt_file_extension'].'</comment> files');
+		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).' '.$this->dic['conf']['txt_file_extension'].'</comment> files');
 
 		$taxonomy = $this->dic['taxonomy'];
 		$taxonomy->initiateTaxonStorage();

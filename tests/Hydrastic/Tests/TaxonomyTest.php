@@ -161,9 +161,9 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
 
 		//Load templates in mocked filesystem for $post->hydrate and $taxon->hydrate to work
-		vfsStream::newDirectory('tpl')->at(vfsStreamWrapper::getRoot());
+		vfsStream::newDirectory('tpl/default/')->at(vfsStreamWrapper::getRoot());
 		foreach ($this->dic['finder']['find']->files()->in($this->fixDir.'tpl/')->name('*.twig') as $f) {
-			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl'));
+			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
 		}
 
 		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');

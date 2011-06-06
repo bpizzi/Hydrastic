@@ -228,10 +228,10 @@ class Post
 			$this->setSlug($this->dic['util']['slugify']->slugify($this->metadatas['General']['title']));
 		}
 
-		if (isset($this->metadatas['General']['file_extension']) && $this->metadatas['General']['file_extension'] != "") {
-			$this->finalWwwFilename = $this->getSlug() . '.' . $this->metadatas['General']['file_extension'];
+		if (isset($this->dic['conf']['file_extension']) && $this->dic['conf']['file_extension'] != "") {
+			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['file_extension'];
 		} else {
-			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['General']['www_file_extension'];
+			$this->finalWwwFilename = $this->getSlug() . '.' . $this->dic['conf']['www_file_extension'];
 		}
 
 		return $this;
@@ -272,10 +272,26 @@ class Post
 			}
 			$this->writeOutput($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
 		}
-		$this->setHtml($this->dic['twig']['parser']->render(
-			$this->metadatas['General']['template'].'.twig',
-			array_merge($this->metadatas['General'], array("content" => $this->content))
-		)); 
+
+		//Defining the template to use, same rules applies as for the theme
+		//TODO: check that the template file exists
+		if (isset($this->metadatas['General']['post_template'])) {
+			$template = $this->metadatas['General']['post_template'];
+		} elseif (isset($this->dic['conf']['metadata_defaults']['General']['post_template'])) {
+			$template = $this->dic['conf']['metadata_defaults']['General']['post_template'];
+		} else {
+			$template = "post.twig";
+		}
+
+		$this->setHtml(
+			$this->dic['twig']['parser']->render(
+				$template,
+				array_merge(
+					$this->metadatas['General'],
+					array("content" => $this->content)
+				)
+			)
+		); 
 
 		return $this;
 	}

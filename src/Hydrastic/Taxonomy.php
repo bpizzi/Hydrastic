@@ -201,13 +201,13 @@ class Taxonomy
 
 	public function cleanWwwDir($force = false) 
 	{
-		if (file_exists($this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/hydrastic-conf.yml')) {
+		if (file_exists($this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/hydrastic-conf.yml')) {
 			//Checking if hydrastic config file exist in www_dir: if yes, it could be that something is wrong
 			//and that we're not in www_dir.
 			$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' Something look wrong: I can\'t access the www_dir, maybe you should ckeck your config file.');
 			die();
 		}
-		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'].'/*';
+		$dir = $this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/*';
 
 		switch (PHP_OS) {
 		case "Linux":
@@ -267,7 +267,7 @@ class Taxonomy
 	 **/
 		public function createDirectoryStruct($taxonStorage = null, $path = null, $level = 0) {
 
-			$baseDir = $this->dic['working_directory'].'/'.$this->dic['conf']['General']['www_dir'];
+			$baseDir = $this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'];
 			if (null === $taxonStorage) {
 				$taxonStorage = $this->getTaxonStorage();
 			}
@@ -360,7 +360,7 @@ class Taxonomy
 			}
 
 			$this->setIndexHtml($this->dic['twig']['parser']->render(
-				'index.twig',
+				$this->dic['conf']['index_template'],
 				array(
 					"title" => "Hydra Accueil",
 					"taxa"  => $firstLevelTaxa,
