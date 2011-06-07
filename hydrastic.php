@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Hydrasticsticstic package.
+ * This file is part of the Hydrastic package.
  *
  * (c) Baptiste Pizzighini <baptiste@bpizzi.fr> 
  *
