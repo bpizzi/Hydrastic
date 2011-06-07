@@ -26,24 +26,24 @@ use Hydrastic\Service\Util as UtilService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
-// Services are utility object lazily loaded throughout the command
+// Services are utility object lazily loaded throughout the application
 $dic = new Pimple();
 
 // Register services that do not depends on config
-$dic['yaml']   = $dic->share(function ($c) { return new YamlService($c); });
+$dic['yaml'] = $dic->share(function ($c) { return new YamlService($c); });
 $dic['util'] = $dic->share(function ($c) { return new UtilService($c); });
 
 // Set the working directory correctly and read/set the conf 
 // depending on being in a phar archive or not.
 $workingDir = dirname(Phar::running(false));
-if( $workingDir == '' ) {
+if ($workingDir == '') {
 	//Currently outside a phar archive
 	$dic['inside_phar'] = false;
 	$dic['working_directory'] = dirname(__DIR__);
 	$dic['hydrastic_dir'] = __DIR__;
 	$defaultConf = $dic['yaml']['parser']->parse(file_get_contents(__DIR__.'/hydrastic-default-conf.yml'));
 	$userConfFile = $dic['working_directory'].'/hydrastic-conf.yml';
-	if(file_exists($userConfFile)) {
+	if (file_exists($userConfFile)) {
 		$userConf = $dic['yaml']['parser']->parse(file_get_contents($userConfFile)); 
 	} else {
 		$userConf = array();
@@ -54,7 +54,7 @@ if( $workingDir == '' ) {
 	$dic['working_directory'] = str_replace(array('phar:/','hydrastic.phar'), '', $workingDir);
 	$dic['hydrastic_dir'] = Phar::running();
 	$userConfFile = $workingDir.'/hydrastic-conf.yml';
-	if(file_exists($userConfFile)) {
+	if (file_exists($userConfFile)) {
 		Phar::mount('hydrastic-conf.yml', $userConfFile);
 		$userConf = $dic['yaml']['parser']->parse(file_get_contents('hydrastic-conf.yml'));
 		$dic['user_conf_defined'] = true;
@@ -83,7 +83,7 @@ $commands = array(
 	new Version($dic),
 	new Init($dic),
 );
-if(!$dic['inside_phar']) {
+if (false === $dic['inside_phar']) {
 	$commands[] = new Compile($dic);
 }
 
