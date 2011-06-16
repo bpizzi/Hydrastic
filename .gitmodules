@@ -16,3 +16,6 @@
 [submodule "vendor/pimple"]
 	path = vendor/pimple
 	url = https://github.com/fabpot/Pimple.git
+[submodule "vendor/textile"]
+	path = vendor/textile
+	url = https://github.com/netcarver/textile.git

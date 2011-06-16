@@ -15,6 +15,7 @@ namespace Hydrastic\Service;
 use Pimple;
 use Hydrastic\TextProcessor\MarkdownProcessor;
 use Hydrastic\TextProcessor\MarkdownExtraProcessor;
+use Hydrastic\TextProcessor\TextileProcessor;
 
 class TextProcessor extends Pimple
 {
@@ -29,6 +30,11 @@ class TextProcessor extends Pimple
 		$this['markdown_extra'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/markdown/MarkdownExtraParser.php';
 			return new MarkdownExtraProcessor();
+		});
+
+		$this['textile'] = $this->share(function () use ($c) {
+			require_once $c['hydrastic_dir'].'/vendor/textile/classTextile.php';
+			return new TextileProcessor();
 		});
 
 	}
