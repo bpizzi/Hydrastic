@@ -14,16 +14,21 @@ namespace Hydrastic\Service;
 
 use Pimple;
 use Hydrastic\TextProcessor\MarkdownProcessor;
+use Hydrastic\TextProcessor\MarkdownExtraProcessor;
 
 class TextProcessor extends Pimple
 {
 
 	public function __construct($c) {
 
-		include $c['hydrastic_dir'].'/vendor/markdown/MarkdownParser.php';
-
 		$this['markdown'] = $this->share(function () use ($c) {
+			require_once $c['hydrastic_dir'].'/vendor/markdown/MarkdownParser.php';
 			return new MarkdownProcessor();
+		});
+
+		$this['markdown_extra'] = $this->share(function () use ($c) {
+			require_once $c['hydrastic_dir'].'/vendor/markdown/MarkdownExtraParser.php';
+			return new MarkdownExtraProcessor();
 		});
 
 	}

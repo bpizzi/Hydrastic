@@ -13,14 +13,15 @@ namespace Hydrastic\TextProcessor;
 
 use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class MarkdownProcessor implements TextProcessorInterface
+class MarkdownExtraProcessor implements TextProcessorInterface
 {
-
+	
 	public function render($content) {
-		$parser = new \MarkdownParser();
+		$parser = new \MarkdownExtraParser();
 
 		return $parser->transform($content);
 	}
 
 }
+
 
