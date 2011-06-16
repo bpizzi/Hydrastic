@@ -16,6 +16,7 @@ use Hydrastic\Service\Yaml as YamlService;
 use Hydrastic\Service\Finder as FinderService;
 use Hydrastic\Service\Util as UtilService;
 use Hydrastic\Service\Twig as TwigService;
+use Hydrastic\Service\TextProcessor as TextProcessorService;
 
 class TaxonomyTest extends PHPUnit_Framework_TestCase
 {
@@ -28,12 +29,13 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->fixDir = __DIR__.'/../fixtures/set1/';
 
 		$this->dic = new Pimple();
+		$this->dic['hydrastic_dir'] = __DIR__.'/../../../';
 		$this->dic['yaml'] = $this->dic->share(function ($c) { return new YamlService($c); });
 		$this->dic['finder'] = $this->dic->share(function ($c) { return new FinderService($c); });
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
 		$this->dic['twig']   = $this->dic->share(function ($c) { return new TwigService($c); });
-		$this->dic['hydrastic_dir'] = __DIR__.'/../../../';
+		$this->dic['textprocessor'] = $this->dic->share(function ($c) { return new TextProcessorService($c); });
 
 		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml')); 
 
@@ -190,8 +192,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
 		$this->assertTrue(file_exists(vfsStream::url('www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
-		$this->assertTrue(file_exists(vfsStream::url('hydrasticRoot/www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
-
-
+		$this->assertTrue(file_exists(vfsStream::url('www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
 	}
 }

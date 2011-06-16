@@ -28,6 +28,7 @@ class Post
 	protected $wwwFile;
 	protected $finalWwwFile;
 	protected $slug;
+	protected $content;
 	protected $metadatas = array();
 	protected $taxonomy = array();
 	protected $output = null;
@@ -115,6 +116,14 @@ class Post
 	public function getHtml()
 	{
 		return $this->html;
+	}
+	public function setContent($content)
+	{
+		$this->content = $content;
+	}
+	public function getContent()
+	{
+		return $this->content;
 	}
 	public function getTaxonomy() 
 	{
@@ -245,13 +254,14 @@ class Post
 	public function parseContent()
 	{
 		// Get the content
-		$this->content = implode("\n", array_slice($this->fileArray, array_search("---", $this->fileArray) + 1, sizeof($this->fileArray)));  
+		$this->setContent(implode("\n", array_slice($this->fileArray, array_search("---", $this->fileArray) + 1, sizeof($this->fileArray))));  
+		//$this->content = $this->dic['textprocessor']['markdown']->render($this->content);
 
 		return $this;
 	}
 
 	/**
-	 * Hydrasticte a template with $content, respect $metaData and $dic['conf'] when needed
+	 * Hydrate a template with $content, respect $metaData and $dic['conf'] when needed
 	 * Must be called after parseContent() and parseMetas()
 	 * And proceed to further actions
 	 */
@@ -270,7 +280,7 @@ class Post
 					$this->writeOutput($this->dic['conf']['command_prefix'].'   ... with metadata <comment>'.$k.'</comment> => <comment>'.$v.'</comment>');
 				}
 			}
-			$this->writeOutput($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->content).'</comment> char(s) (<comment>'.str_word_count($this->content).'</comment> word(s))');
+			$this->writeOutput($this->dic['conf']['command_prefix'].'   ... and a content of <comment>'.strlen($this->getContent()).'</comment> char(s) (<comment>'.str_word_count($this->getContent()).'</comment> word(s))');
 		}
 
 		//Defining the template to use, same rules applies as for the theme
@@ -288,7 +298,7 @@ class Post
 				$template,
 				array_merge(
 					$this->metadatas['General'],
-					array("content" => $this->content)
+					array("content" => $this->getContent())
 				)
 			)
 		); 

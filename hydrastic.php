@@ -23,6 +23,7 @@ use Hydrastic\Service\Twig as TwigService;
 use Hydrastic\Service\Yaml as YamlService;
 use Hydrastic\Service\Finder as FinderService;
 use Hydrastic\Service\Util as UtilService;
+use Hydrastic\Service\TextProcessor as TextProcessorService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
@@ -70,8 +71,9 @@ $dic['conf'] = $dic['util']['array.merger']->mergeUniqueKeysRecursive($defaultCo
 $dic['taxonomy'] = $dic->share(function ($c) { return new Taxonomy($c); });
 
 // Register services
-$dic['twig']   = $dic->share(function ($c) { return new TwigService($c); });
-$dic['finder'] = $dic->share(function ($c) { return new FinderService($c); });
+$dic['twig']          = $dic->share(function ($c) { return new TwigService($c); });
+$dic['finder']        = $dic->share(function ($c) { return new FinderService($c); });
+$dic['textprocessor'] = $dic->share(function ($c) { return new TextProcessorService($c); });
 
 // Declare (Symfony Component) Application 
 $dic['hydrastic_app'] = new Application('Hydrastic',$dic['conf']['version']);

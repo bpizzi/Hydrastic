@@ -8,6 +8,7 @@ txt_file_extension: txt
 theme: default
 taxon_template: taxon.twig
 post_template: post.twig
+textprocessor: markdown
 metadata_defaults:
   General:
     title: Hydrastic 
