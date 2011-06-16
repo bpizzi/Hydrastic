@@ -17,7 +17,7 @@ use Hydrastic\Service\Util as UtilService;
 use Hydrastic\Service\Twig as TwigService;
 use Hydrastic\Service\TextProcessor as TextProcessorService;
 
-class TextileProcessorTest extends PHPUnit_Framework_TestCase
+class RestructuredTextProcessorTest extends PHPUnit_Framework_TestCase
 {
 
 	protected $dic = array();
@@ -41,18 +41,21 @@ class TextileProcessorTest extends PHPUnit_Framework_TestCase
 
 	public function testRender()
 	{
-		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-textile-1.textile')));
+		$file = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir)->name('post-rst-1.rst')));
 
 		$post = new Post($this->dic);
 		$post->read($file)->clean()->parseMetas()->parseContent();
 
-		$matcher1 = array('tag' => 'em', 'content' => 'Ipsum');
-		$matcher2 = array('tag' => 'strong', 'content' => 'Lorem');
+		$matcher1 = array('tag' => 'em', 'content' => 'Lorem');
+		$matcher2 = array('tag' => 'strong', 'content' => 'Ipsum');
+		$matcher3 = array('tag' => 'li', 'content' => 'lorem');
 
-		$this->assertTag($matcher1, $post->getContent(), 'Textile processor properly parse textile formatted text (italic).');
-		$this->assertTag($matcher2, $post->getContent(), 'Textile processor properly parse textile formatted text (strong).');
+		$this->assertTag($matcher1, $post->getContent(), 'reStructuredText processor properly parse reST formatted text (italic).');
+		$this->assertTag($matcher2, $post->getContent(), 'reStructuredText processor properly parse reST formatted text (strong).');
+		$this->assertTag($matcher3, $post->getContent(), 'reStructuredText processor properly parse reST formatted text (bullet list).');
 
 	}
 }
+
 
 

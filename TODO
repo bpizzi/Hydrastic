@@ -1,7 +1,7 @@
 Stuff being implemented.
 
 Functionnal
-- Parsing content with Textile, Markdown, ReStructuredText and Liquid
+- Parsing content with Textile, Markdown, MarkdownExtra, ReStructuredText and Liquid
 - Helpers ( Link / Menu / Asset / Breadcrumbs )
 - widgets (categories, tags, links, facebook, twitter, etc)
 - RSS feeds
