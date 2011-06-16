@@ -3,6 +3,7 @@ General:
   description: Description
   metakeys: Keys
   template: post
+  processor: markdown
 Taxonomy: 
   Cat:
     Cat1:
@@ -12,4 +13,4 @@ Taxonomy:
     - Tag2
 ---
 *Lorem*
-**Lorem**
+**Ipsum**

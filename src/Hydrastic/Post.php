@@ -70,6 +70,10 @@ class Post
 		return $this->filepath;
 	}
 
+	public function hasMetadata($key)
+	{
+		return array_key_exists($key, $this->metadatas["General"]);
+	}
 	public function getMetadata($key)
 	{
 		if (false === array_key_exists($key, $this->metadatas["General"])) {
@@ -248,14 +252,16 @@ class Post
 
 	/**
 	 * Extract the content of $fileArray
+	 * Eventually process the content threw a valid text processor
 	 * Must be called after clean()
 	 * And proceed to further actions
 	 */
 	public function parseContent()
 	{
-		// Get the content
 		$this->setContent(implode("\n", array_slice($this->fileArray, array_search("---", $this->fileArray) + 1, sizeof($this->fileArray))));  
-		//$this->content = $this->dic['textprocessor']['markdown']->render($this->content);
+		if ($this->hasMetadata('processor') && isset($this->dic['textprocessor'][$this->getMetadata('processor')])) {
+			$this->content = $this->dic['textprocessor'][$this->getMetadata('processor')]->render($this->content);
+		}
 
 		return $this;
 	}

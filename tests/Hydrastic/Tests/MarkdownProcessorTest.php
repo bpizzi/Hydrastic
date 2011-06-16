@@ -46,13 +46,11 @@ class MarkdownProcessorTest extends PHPUnit_Framework_TestCase
 		$post = new Post($this->dic);
 		$post->read($file)->clean()->parseMetas()->parseContent();
 
-		$content = $this->dic['textprocessor']['markdown']->render($post->getContent());
-
 		$matcher1 = array('tag' => 'em', 'content' => 'Lorem');
 		$matcher2 = array('tag' => 'strong', 'content' => 'Ipsum');
 
-		$this->assertTag($matcher1, $content, 'Mardown processor properly parse markdown formatted text (italic).');
-		$this->assertTag($matcher2, $content, 'Mardown processor properly parse markdown formatted text (strong).');
+		$this->assertTag($matcher1, $post->getContent(), 'Mardown processor properly parse markdown formatted text (italic).');
+		$this->assertTag($matcher2, $post->getContent(), 'Mardown processor properly parse markdown formatted text (strong).');
 
 	}
 }
