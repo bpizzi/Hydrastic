@@ -1,0 +1,20 @@
+General:
+  title: Title
+  description: Description
+  metakeys: Keys
+  template: post
+  processor: texy
+Taxonomy: 
+  Cat:
+    Cat1:
+      Subcat1:
+        - Elem1Subcat1
+  Tag:
+    - Tag2
+---
+=== Ipsum ===
+
+
+.{color:blue}
+Lorem
+

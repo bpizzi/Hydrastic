@@ -19,3 +19,6 @@
 [submodule "vendor/textile"]
 	path = vendor/textile
 	url = https://github.com/netcarver/textile.git
+[submodule "vendor/texy"]
+	path = vendor/texy
+	url = https://github.com/dg/texy.git
