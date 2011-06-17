@@ -23,4 +23,11 @@ interface TextProcessorInterface
 	 */
 	function render($text);
 
+	/**
+	 * Registers the file extensions for this text processor
+	 * Will be used during html generation to know after which 
+	 * files to look
+	 */
+	function register();
+
 }

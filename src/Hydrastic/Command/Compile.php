@@ -72,12 +72,7 @@ EOF
 			->notName('Compiler.php')
 			->in(__DIR__.'/../..')
 			->in(__DIR__.'/../../../themes')
-			->in(__DIR__.'/../../../vendor/pimple')
-			->in(__DIR__.'/../../../vendor/Symfony/Component/ClassLoader')
-			->in(__DIR__.'/../../../vendor/Symfony/Component/Console')
-			->in(__DIR__.'/../../../vendor/Symfony/Component/Finder')
-			->in(__DIR__.'/../../../vendor/Symfony/Component/Yaml')
-			->in(__DIR__.'/../../../vendor/twig/lib')
+			->in(__DIR__.'/../../../vendor')
 			;
 
 		foreach ($finder as $file) {

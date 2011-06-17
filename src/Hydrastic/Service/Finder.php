@@ -26,12 +26,16 @@ class Finder extends Pimple
 
 		$this['txt_files'] = $this->share(function () use ($c) {
 			$txtDir = $c['working_directory'].'/'.$c['conf']['txt_dir'].'/';
-			$namePattern = '*.'.$c['conf']['txt_file_extension'];
 			$f = new SymfonyFinder();
 			$f->files()
 				->ignoreVCS(true)
-				->name($namePattern)
 				->in($txtDir);
+
+			foreach ($c['txt_extensions_registered'] as $extension) {
+				//$f->name('*.'.$extension);
+				echo "Autorise $extension\n";
+			}
+
 			return iterator_to_array($f);
 		});                         
 

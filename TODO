@@ -16,6 +16,8 @@ Functionnal
 - Comments handling : Facebook comments / disq.us / Comments.php (comments.js frontside)
 - A default set of template files
 - Standard 404/50x page
+- Online live editing password protected interface (yet to be decided...)
+- Publishing task (ftp/ssh/rsync/etc)
 
 Internal 
 - Unit tests

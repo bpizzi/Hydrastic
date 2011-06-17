@@ -11,23 +11,26 @@
 
 namespace Hydrastic\TextProcessor;
 
-use Hydrastic\TextProcessor\TextProcessorBase;
 use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class MarkdownProcessor extends TextProcessorBase implements TextProcessorInterface
+class TextProcessorBase implements TextProcessorInterface
 {
 
-	public $extensions = array(
-		'md',
-		'mdown',
-		'markdown',
-	);
+	protected $dic = array();
 
-	public function render($content) {
-		$parser = new \MarkdownParser();
-
-		return $parser->transform($content);
+	public function __construct($c) {
+		$this->dic = $dic;
 	}
 
+	public function render($content) {
+
+	}
+
+	public function register() {
+		foreach ($this->extensions as $e) {
+			$this->dic['txt_extensions_registered'][] = $e;
+		}
+	}
 }
+
 

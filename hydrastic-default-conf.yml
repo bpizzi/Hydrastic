@@ -4,7 +4,6 @@ txt_dir: txt
 tpl_dir: tpl
 www_dir: www
 www_file_extension: html
-txt_file_extension: txt
 theme: default
 taxon_template: taxon.twig
 index_template: index.twig

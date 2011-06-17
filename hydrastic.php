@@ -73,6 +73,7 @@ $dic['taxonomy'] = $dic->share(function ($c) { return new Taxonomy($c); });
 // Register services
 $dic['twig']          = $dic->share(function ($c) { return new TwigService($c); });
 $dic['finder']        = $dic->share(function ($c) { return new FinderService($c); });
+$dic['txt_extensions_registered'] = array();
 $dic['textprocessor'] = $dic->share(function ($c) { return new TextProcessorService($c); });
 
 // Declare (Symfony Component) Application 

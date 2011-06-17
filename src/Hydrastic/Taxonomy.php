@@ -345,7 +345,6 @@ class Taxonomy
 
 		}
 
-
 		/**
 		 * Hydrate the html for the root index file
 		 **/

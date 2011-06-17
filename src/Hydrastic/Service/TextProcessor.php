@@ -24,9 +24,13 @@ class TextProcessor extends Pimple
 
 	public function __construct($c) {
 
+		$c['txt_extensions_registered'] = array();
+
 		$this['markdown'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/markdown/MarkdownParser.php';
-			return new MarkdownProcessor();
+			$p = new MarkdownProcessor(); 
+			$p->register();
+			return $p;
 		});
 
 		$this['markdown_extra'] = $this->share(function () use ($c) {
