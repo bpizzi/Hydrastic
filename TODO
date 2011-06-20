@@ -2,8 +2,14 @@ List of stuff being/already implemented.
 
 Functionnal
 ===========
+  
+  [DONE] Taxonomy
+     [DONE] Unlimited levels
+     [DONE] Generation of directories
+     [DONE] Generation of each post in their right folders regarding their metadata
+     [DONE] Fully unit tested
 
-  [DONE] Parsing content 
+  [DONE] Content parsing 
   	 [DONE] Textile
   	 [DONE] Markdown
   	 [DONE] MarkdownExtra  
@@ -30,6 +36,7 @@ Functionnal
      Sitemap Generation
      Google Analytics 
      Google Webmaster Toolkit
+     robot.txt
 
    Migration script 
      WordPress
@@ -61,7 +68,7 @@ Internal
 
     [BEING DONE] Unit tests
  
-    Use Monolog to log objects behavior (whether than useless //echo)
+    Use Seldaek/monolog to log objects behavior (rather than useless //echo)
 
     Integrated webserver for live-viewing
 
@@ -70,6 +77,8 @@ Internal
 
 Doc
 ===
+
+    Writing the website www.hydrastic.com
     
     Howto run on linux/mac/windows
 
