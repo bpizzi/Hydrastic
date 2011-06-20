@@ -12,9 +12,8 @@
 namespace Hydrastic\TextProcessor;
 
 use Hydrastic\TextProcessor\TextProcessorBase;
-use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class MarkdownProcessor extends TextProcessorBase implements TextProcessorInterface
+class MarkdownProcessor extends TextProcessorBase
 {
 
 	public $extensions = array(

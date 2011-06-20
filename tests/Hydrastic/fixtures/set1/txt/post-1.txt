@@ -3,6 +3,7 @@ General:
   description: Description
   metakeys: Keys
   template: post
+  processor: title
 Taxonomy: 
   Cat:
     Cat1:

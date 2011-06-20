@@ -13,23 +13,18 @@ namespace Hydrastic\TextProcessor;
 
 use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class TextProcessorBase implements TextProcessorInterface
+abstract class TextProcessorBase implements TextProcessorInterface
 {
 
 	protected $dic = array();
+	public $extensions = array();
 
 	public function __construct($c) {
-		$this->dic = $dic;
-	}
-
-	public function render($content) {
-
+		$this->dic = $c;
 	}
 
 	public function register() {
-		foreach ($this->extensions as $e) {
-			$this->dic['txt_extensions_registered'][] = $e;
-		}
+		$this->dic['txt_extensions_registered'] = array_merge($this->dic['txt_extensions_registered'], $this->extensions);
 	}
 }
 

@@ -11,11 +11,20 @@
 
 namespace Hydrastic\TextProcessor;
 
-use Hydrastic\TextProcessor\TextProcessorInterface;
+use Hydrastic\TextProcessor\TextProcessorBase;
 
-class MarkdownExtraProcessor implements TextProcessorInterface
+class MarkdownExtraProcessor extends TextProcessorBase
 {
 	
+	public $extensions = array(
+		'md',
+		'mdown',
+		'mdextra',
+		'markdown',
+		'mdownextra',
+		'markdownextra',
+	);
+
 	public function render($content) {
 		$parser = new \MarkdownExtraParser();
 

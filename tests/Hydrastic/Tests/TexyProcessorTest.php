@@ -32,6 +32,7 @@ class TexyProcessorTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
 		$this->dic['twig']   = $this->dic->share(function ($c) { return new TwigService($c); });
+		$dic['txt_extensions_registered'] = array();
 		$this->dic['textprocessor']   = $this->dic->share(function ($c) { return new TextProcessorService($c); });
 		$this->dic['hydrastic_dir'] = __DIR__.'/../../../';
 

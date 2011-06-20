@@ -32,8 +32,7 @@ class Finder extends Pimple
 				->in($txtDir);
 
 			foreach ($c['txt_extensions_registered'] as $extension) {
-				//$f->name('*.'.$extension);
-				echo "Autorise $extension\n";
+				$f->name('*.'.$extension);
 			}
 
 			return iterator_to_array($f);

@@ -13,8 +13,14 @@ namespace Hydrastic\TextProcessor;
 
 use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class TextileProcessor implements TextProcessorInterface
+class TextileProcessor extends TextProcessorBase
 {
+
+	public $extensions = array(
+		'tex',
+		'txile',
+		'textile',
+	);
 
 	public function render($content) {
 		$parser = new \Textile();

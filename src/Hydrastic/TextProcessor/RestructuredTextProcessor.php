@@ -13,15 +13,21 @@ namespace Hydrastic\TextProcessor;
 
 use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class RestructuredTextProcessor implements TextProcessorInterface
+class RestructuredTextProcessor extends TextProcessorBase
 {
+
+	public $extensions = array(
+		'rst',
+		'rest',
+		'restructured',
+		'restructuredtext',
+	);
 
 	public function render($content) {
 		$parser = new \RST_Parser();
 
 		return $parser->transform($content);
 	}
-
 }
 
 

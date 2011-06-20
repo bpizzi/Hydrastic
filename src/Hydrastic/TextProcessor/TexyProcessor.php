@@ -13,8 +13,13 @@ namespace Hydrastic\TextProcessor;
 
 use Hydrastic\TextProcessor\TextProcessorInterface;
 
-class TexyProcessor implements TextProcessorInterface
+class TexyProcessor extends TextProcessorBase
 {
+
+	public $extensions = array(
+		'txy',
+		'texy',
+	);
 	
 	public function render($content) {
 		$parser = new \Texy();
@@ -23,6 +28,3 @@ class TexyProcessor implements TextProcessorInterface
 	}
 
 }
-
-
-

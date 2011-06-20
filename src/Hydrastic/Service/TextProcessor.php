@@ -28,32 +28,39 @@ class TextProcessor extends Pimple
 
 		$this['markdown'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/markdown/MarkdownParser.php';
-			$p = new MarkdownProcessor(); 
+			$p = new MarkdownProcessor($c); 
 			$p->register();
 			return $p;
 		});
 
 		$this['markdown_extra'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/markdown/MarkdownExtraParser.php';
-			return new MarkdownExtraProcessor();
+			$p = new MarkdownExtraProcessor($c);
+			$p->register();
+			return $p;
 		});
 
 		$this['textile'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/textile/classTextile.php';
-			return new TextileProcessor();
+			$p = new TextileProcessor($c);
+			$p->register();
+			return $p;
 		});
 
 		$this['restructuredtext'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/restructuredtext/restructuredtext.php';
-			return new RestructuredTextProcessor();
+			$p = new RestructuredTextProcessor($c);
+			$p->register();
+			return $p;
 		});
 
 		$this['texy'] = $this->share(function () use ($c) {
 			require_once $c['hydrastic_dir'].'/vendor/texy/Texy/Texy.php';
-			return new TexyProcessor();
+			$p = new TexyProcessor($c);
+			$p->register();
+			return $p;
 		});
 
 	}
 
 }
-

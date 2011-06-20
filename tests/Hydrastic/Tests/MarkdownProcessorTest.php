@@ -9,7 +9,6 @@
  *
  */
 
-
 use Hydrastic\Post;
 use Hydrastic\Service\Yaml as YamlService;
 use Hydrastic\Service\Finder as FinderService;
@@ -54,4 +53,3 @@ class MarkdownProcessorTest extends PHPUnit_Framework_TestCase
 
 	}
 }
-
