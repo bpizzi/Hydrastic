@@ -164,12 +164,12 @@ EOF
 		while (false === $confValid) {
 			$output->writeln($this->dic['conf']['command_prefix'].' Almost done! please review your configuration before I write it to disc:');
 			foreach ($folderConf as $k => $v) {
-				$output->writeln('         For holding <comment>'.$folderConfDefinition[$k]["type"].'</comment>, following folder will be used: <comment>'.$v.'</comment> (key <info>'.$k.'</info>)');
+				$output->writeln('         For holding <comment>'.$folderConfDefinition[$k]["type"].'</comment>, the following folder will be used: <comment>'.$v.'</comment> (key <info>'.$k.'</info>)');
 			}
 			foreach ($siteConf as $k => $v) {
-				$output->writeln('         The configuration key <comment>'.$k.'</comment>, for your site is: <comment>'.$v.'</comment> (key <info>'.$k.'</info>)');
+				$output->writeln('         The configuration key <comment>'.$k.'</comment> is <comment>'.$v.'</comment> (key <info>'.$k.'</info>)');
 			}
-			$response = $dialog->ask($output, $this->dic['conf']['command_prefix']." If it looks ok to you, answer <info>done</info>.\n".$this->dic['conf']['command_prefix']." if you want to modify a configuration key now: please indicate me that key (you will have the opportunity to tweak it later by modifying <comment>hydrastic-conf.tml</comment>)");
+			$response = $dialog->ask($output, $this->dic['conf']['command_prefix']." If it looks ok to you, answer <info>done</info>.\n".$this->dic['conf']['command_prefix']." if you want to modify a configuration key now: please indicate me that key (you will have the opportunity to tweak it later by modifying <comment>hydrastic-conf.yml</comment>)");
 			if ($response == "done") {
 				$confValid = true;
 			} else {
