@@ -240,7 +240,7 @@ EOF
 		$output->writeln($this->dic['conf']['command_prefix'].' You can begin to write your templates and text files and try <info>hydrastic:process</info> command to generate you static content!');
 
 		//Create an executable shortcut to hydrastic.phar under linux
-		if (PHP_OS == 'Linux') {
+		if (PHP_OS === 'Linux') {
 			file_put_contents('hydrastic', "#!/bin/sh\nphp hydrastic.phar $@");
 			system('chmod +x hydrastic');
 			$output->writeln($this->dic['conf']['command_prefix'].' I created a shorcut for you : you can now run me with <info>./hydrastic</info>, assuming PHP binary is accessible from your ENV.');
