@@ -19,7 +19,7 @@ class Twig extends Pimple
 
 	public function __construct($c) {
 
-		require $c['hydrastic_dir'].'/vendor/twig/lib/Twig/Autoloader.php';
+		require_once $c['hydrastic_dir'].'/vendor/twig/lib/Twig/Autoloader.php';
 
 		\Twig_Autoloader::register();
 

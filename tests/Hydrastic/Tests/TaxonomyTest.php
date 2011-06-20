@@ -39,6 +39,14 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml')); 
 
+ 		//Mocking the filesystem
+		vfsStreamWrapper::register();
+		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydrasticRoot'));
+
+		//Quickly testing if vfsStream works well... just to be sure...
+		mkdir(vfsStream::url('hydrasticRoot/www'));
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
+
 	}
 
 	/**
@@ -154,13 +162,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testCreateDirectoryStruct()
 	{
-		//Mocking the filesystem
-		vfsStreamWrapper::register();
-		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydrasticRoot'));
-
-		//Quickly testing if vfsStream works well... just to be sure...
-		mkdir(vfsStream::url('hydrasticRoot/www'));
-		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
 
 		//Load templates in mocked filesystem for $post->hydrate and $taxon->hydrate to work
 		vfsStream::newDirectory('tpl/default/')->at(vfsStreamWrapper::getRoot());
@@ -176,10 +177,21 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/cat/cat1'), "cat/cat1 should have been created by createDirectoryStruct()");
 		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/elem1subtag1'), "tag/Subtag1/Elem1Subtag1 should have been created by createDirectoryStruct()");
 		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/subtag1/subtag2/elem1subtag2'), "Avoiding path bug in recursivity : tag/subtag1/subtag2/elem1subtag2 shouldn't exist");
+	}
+
+	public function testCreateIndexFiles()
+	{
+		//Load templates in mocked filesystem for $post->hydrate and $taxon->hydrate to work
+		vfsStream::newDirectory('tpl/default/')->at(vfsStreamWrapper::getRoot());
+		foreach ($this->dic['finder']['find']->files()->in($this->fixDir.'tpl/')->name('*.twig') as $f) {
+			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
+		}
+
+		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
+		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
+		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
 		$post = new Post($this->dic);
-		//$postFile = reset(iterator_to_array($this->dic['finder']['find']->files()->in($this->fixDir.'txt/')->name('post-1.txt')));
-		//echo "\n--post file : ".$postFile->getRealPath()."--\n";
 		$post->read($this->fixDir.'txt/post-1.txt')
 			->clean()
 			->parseMetas()
@@ -187,12 +199,8 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 			->hydrate()
 			->attachToTaxonomy();
 
-		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot'); 
-		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
-		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
-
-		//TODO: tobefixed
 		//$this->assertTrue(file_exists(vfsStream::url('www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
 		//$this->assertTrue(file_exists(vfsStream::url('www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
 	}
+	 
 }
