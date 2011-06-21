@@ -1,5 +1,5 @@
-version: 0.1
-command_prefix: <info>Hydrastic></info>
+version: 0.1.1
+command_prefix: <info>Hydrastic 0.1.1></info>
 txt_dir: txt
 tpl_dir: tpl
 www_dir: www

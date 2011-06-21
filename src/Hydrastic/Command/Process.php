@@ -67,8 +67,6 @@ EOF
 		$taxonomy->initiateTaxonStorage();
 
 		foreach ($files as $file) {
-			$output->writeln('----->');
-
 			$post = new Post($this->dic);
 
 			$post->read($file)
@@ -77,7 +75,6 @@ EOF
 				->parseContent()
 				->hydrate()
 				->attachToTaxonomy();
-
 		} //-- parsing content files
 
 		if ($input->getOptions('f')) {

@@ -33,6 +33,7 @@ class Post
 	protected $taxonomy = array();
 	protected $output = null;
 	protected $taxonStorage;
+	protected $ignore = false;
 
 	/**
 	 * Constructs the Post object
@@ -68,6 +69,10 @@ class Post
 	public function getFilepath()
 	{
 		return $this->filepath;
+	}
+	public function getFilename() 
+	{
+		return end($this->getFilepath());
 	}
 
 	public function hasMetadata($key)
@@ -140,11 +145,10 @@ class Post
 	 * @param array $taxonomy An array of taxonomy [two-levels array('taxon1' => array('class1', 'class2', 'class3'), 'taxon2' => array(...), ...)]
 	 */
 	public function setTaxonomy($taxonomy) {
-		if (is_array($taxonomy)) {
-			$this->taxonomy = $taxonomy;
-		} else {
-			throw \Exception();
+		if (false === is_array($taxonomy)) {
+			throw \Exception('Post->setTaxonomy() only accept arrays, "'.gettype($taxonomy).'" given.');
 		}
+		$this->taxonomy = $taxonomy;
 	}
 
 	/**
@@ -159,7 +163,19 @@ class Post
 
 	public function setFileArray($array)
 	{
+		if (false === is_array($array)) {
+     		throw new \Exception('Post->setFileArray() only accept arrays, "'.gettype($array).'" given.');
+		}
 		$this->fileArray = $array;
+	}
+
+	public function setIgnored($bool) 
+	{
+		$this->ignore = $bool;
+	}
+	public function isIgnored()
+	{
+		return $this->ignore;
 	}
 
 	public function hasTaxon($taxon)
@@ -189,8 +205,16 @@ class Post
 		if (false === file_exists($file)) {
 			throw new \Exception("\$post->read() except a valid readable file as first parameter: $file isn't a valid file.");
 		} 
+
 		$this->setFilepath($file);
 		$this->wwwFile = reset(explode('.', end(explode('/',$file))));
+
+		if ('' === file_get_contents($file)) {
+			$this->writeOutput($this->dic['conf']['command_prefix']." <info>".$this->getFilename()."</info> is a blank file, I will skip it.");
+			$this->setIgnored(true);
+			return $this;
+		} 
+
 		$this->writeOutput($this->dic['conf']['command_prefix'].' Processing file <comment>'.$this->wwwFile.' ('.$file.')</comment>');
 
 		return $this;
@@ -203,7 +227,14 @@ class Post
 	 */
 	public function clean()
 	{
+		if (true === $this->isIgnored()) {
+			return $this;
+		}
+
 		$this->setFileArray(file($this->getFilepath()));
+		if (false === is_array($this->fileArray)) {
+			throw new \Exception("Post->clean() needs a proper fileArray variable.");
+		}
 		array_walk($this->fileArray, function(&$item, $key) {
 			$item = str_replace("\n", '', $item);
 		});                                     
@@ -218,12 +249,23 @@ class Post
 	 */
 	public function parseMetas()
 	{
+		if (true === $this->isIgnored()) {
+			return $this;
+		}
+
 		// Get the metadatas
 		$metaDatasStr =  implode(chr(13), array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
+
+		if ("" === $metaDatasStr) {
+			throw new \Exception("The file $this has no metadata");
+		}
 
 		// Parse the metadatas in a array, using defaults when necessary
 		$this->setMetadatas($this->dic['yaml']['parser']->parse($metaDatasStr));
 
+		if (false === is_array($this->metadatas['General'])) {
+			throw new \Exception("Post->parseMetas() needs a proper 'General' metadata entry.");
+		}
 		array_walk($this->metadatas['General'], function(&$item, $key, $conf) {
 			if ($item == "") {
 				$item = $conf['metadata_defaults']['General'][$key];
@@ -258,6 +300,10 @@ class Post
 	 */
 	public function parseContent()
 	{
+		if (true === $this->isIgnored()) {
+			return $this;
+		}
+
 		$this->setContent(implode("\n", array_slice($this->fileArray, array_search("---", $this->fileArray) + 1, sizeof($this->fileArray))));  
 		if ($this->hasMetadata('processor') && isset($this->dic['textprocessor'][$this->getMetadata('processor')])) {
 			$this->content = $this->dic['textprocessor'][$this->getMetadata('processor')]->render($this->content);
@@ -273,6 +319,10 @@ class Post
 	 */
 	public function hydrate()
 	{
+		if (true === $this->isIgnored()) {
+			return $this;
+		}
+
 		if (null != $this->output && $this->output->getVerbosity()==2) {
 			foreach ($this->metadatas['General'] as $k => $v) {
 				if (is_array($v)) {
@@ -314,6 +364,10 @@ class Post
 
 	public function attachToTaxonomy() 
 	{
+		if (true === $this->isIgnored()) {
+			return $this;
+		}
+
 		if (false === isset($this->dic['taxonomy']) || false === $this->dic['taxonomy']->isInitiated()) {
 			throw new \Exception("You tried to attach a post to the general Taxonomy before having initiated it");
 		}
@@ -347,6 +401,10 @@ class Post
 	 */
 	public function writeToFile($path) 
 	{
+		if (true === $this->isIgnored()) {
+			return $this;
+		}
+
 		$fileToWrite = $path.'/'.$this->finalWwwFilename;
 
 		// Write the html

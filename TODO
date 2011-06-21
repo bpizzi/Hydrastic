@@ -15,6 +15,7 @@ Functionnal
   	 [DONE] MarkdownExtra  
   	 [DONE] ReStructuredText 
   	 [DONE] Texy! (need iconv.so enabled in php.ini)
+  	 Code 
 
    Helpers 
      Link
@@ -43,7 +44,10 @@ Functionnal
      Drupal
      Joomla
 
-   Generating a temporary index.html "Website is being updated" for live updates
+   Tasks
+     Generating a temporary index.html "Website is being updated" for live updates
+     Publishing task (ftp/ssh/rsync/etc)
+     INIT should put a default index.html at the root "You should setup your webserver to point to www/ instead"
 
    Assets management: list of files to include (css/js) and post-processors (compass, js-min, etc)
 
@@ -57,10 +61,8 @@ Functionnal
      Smarty
      Standard 404/50x page
 
-
    Online live editing password protected interface (yet to be decided...)
    
-   Publishing task (ftp/ssh/rsync/etc)
 
 
 Internal 
@@ -78,7 +80,7 @@ Internal
 Doc
 ===
 
-    Writing the website www.hydrastic.com
+    [BEING DONE] Writing the website www.hydrastic.com
     
     Howto run on linux/mac/windows
 
