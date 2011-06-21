@@ -1,6 +1,20 @@
 List of stuff being/already implemented.
 
-Functionnal
+Roadmap
+=======
+
+v0.1: Multilevel taxonomy, basic content generation, parsing content threw processors.
+v0.2: Theme management, helpers
+v0.3: Assets, Images
+v0.4: Widgets
+v0.5: Aside generation (sitemaps, rss...)
+v0.6: Publish task + misc tasks
+v0.7: Comments
+v0.8: Metadata parser
+v0.9: Logging
+v1.0: Online Editing
+
+Functional
 ===========
   
   [DONE] Taxonomy
@@ -56,10 +70,17 @@ Functionnal
    Comments handling : Facebook comments / disq.us / Comments.php (comments.js frontside)
    
    Template engine for theme management 
-     [DONE] Twig + defaut set of template files
+     [DONE] Twig + default set of template files
      Liquid
      Smarty
      Standard 404/50x page
+
+   Theme 
+     Theme should provide a set of helpers to include asset in content
+     Taxon should declare a special template
+     Post should inherit template from is parent template if not specified in its metadatas
+     Theme should only place assets in www/ if they are called somewhere in html files
+     
 
    Online live editing password protected interface (yet to be decided...)
    
