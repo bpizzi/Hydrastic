@@ -4,14 +4,14 @@ Roadmap
 =======
 
 v0.1: Multilevel taxonomy, basic content generation, parsing content threw processors.
-v0.2: Theme management, helpers
-v0.3: Assets, Images
-v0.4: Widgets
-v0.5: Aside generation (sitemaps, rss...)
-v0.6: Publish task + misc tasks
-v0.7: Comments
-v0.8: Metadata parser
-v0.9: Logging
+v0.2: Logging
+v0.3: Theme management, helpers
+v0.4: Assets, Images
+v0.5: Widgets
+v0.6: Aside generation (sitemaps, rss...)
+v0.7: Publish task + misc tasks
+v0.8: Comments
+v0.9: Metadata parser
 v1.0: Online Editing
 
 Functional
