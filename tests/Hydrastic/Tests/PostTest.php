@@ -47,4 +47,26 @@ class PostTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("Title", $post->getMetadata('title'), "getMetadata('title') retrieve General:title value from post's metadatas");
 
 	}
+
+	/**
+ 	 * @expectedException Exception
+	 */
+	public function testReadInvalidFilename() {
+		$post = new Post($this->dic);
+		$post->read($this->fixDir.'/this-file-does-not-exists-and-reading-it-should-raise-an-exception.txt');
+	}
+
+	public function testReadBlankTextFile() {
+		$post = new Post($this->dic);
+		$post->read($this->fixDir.'/txt/post-blank.markdown');
+
+		$this->assertTrue($post->isIgnored(), "A blank text file should return true to Post->isIgnored()");
+	}
+
+	public function testGetFilename() {
+		$post = new Post($this->dic);
+		$post->read($this->fixDir.'/txt/post-markdown-1.markdown');
+
+		$this->assertEquals('post-markdown-1.markdown', $post->getFilename(), "Post->getFilename() retrieve the filename with its extension");
+	}
 }

@@ -66,13 +66,22 @@ class Post
 		return $this->taxonStorage;
 	}
 
+	/**
+	 * Set the filepath of the original content
+	 *
+	 * @param $filepath A full filepath to a text file
+	 */
+	public function setFilepath($filepath)
+	{
+		$this->filepath = $filepath;
+	}
 	public function getFilepath()
 	{
 		return $this->filepath;
 	}
 	public function getFilename() 
 	{
-		return end($this->getFilepath());
+		return end(explode("/", $this->getFilepath()));
 	}
 
 	public function hasMetadata($key)
@@ -113,6 +122,10 @@ class Post
 		$this->slug = $slug;
 	}
 
+	public function getWwwFile() 
+	{
+		return $this->wwwFile;
+	}
 	public function getFinalWwwFile() 
 	{
 		return $this->finalWwwFilename;
@@ -151,15 +164,6 @@ class Post
 		$this->taxonomy = $taxonomy;
 	}
 
-	/**
-	 * Set the filepath of the original content
-	 *
-	 * @param $filepath A full filepath to a text file
-	 */
-	public function setFilepath($filepath)
-	{
-		$this->filepath = $filepath;
-	}
 
 	public function setFileArray($array)
 	{
