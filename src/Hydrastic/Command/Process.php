@@ -52,16 +52,44 @@ EOF
 
 	}
 
+	public function log($msg, $level = 'info') 
+	{
+		$msg = ' '.$msg;
+		switch ($level) {
+		case "warning":
+			$this->dic['logger']['hydration']->addWarning($msg);
+			break;
+		case "error":
+			$this->dic['logger']['hydration']->addError($msg);
+			break;
+		case "alert":
+			$this->dic['logger']['hydration']->addAlert($msg);
+			break;
+		case "critical":
+			$this->dic['logger']['hydration']->addCritical($msg);
+			break;
+		case "debug":
+			$this->dic['logger']['hydration']->addDebug($msg);
+			break;
+		case "info":
+		default:
+			$this->dic['logger']['hydration']->addInfo($msg);
+			break;
+		}
+
+		$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' '.$msg);
+	}
+
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 
 		$this->dic['output'] = $output;
 
-		$output->writeln($this->dic['conf']['command_prefix'].' Started hydration of your text files');
+		$this->log('Started hydration of your text files');
 
 		$files = $this->dic['finder']['txt_files'];
 
-		$output->writeln($this->dic['conf']['command_prefix'].' Found <comment>'.count($files).'</comment> text files');
+		$this->log('Found <comment>'.count($files).'</comment> text files');
 
 		$taxonomy = $this->dic['taxonomy'];
 		$taxonomy->initiateTaxonStorage();
@@ -86,9 +114,7 @@ EOF
 
 		$taxonomy->hydrateIndexFile()->writeIndexFile($this->dic['working_directory'].'/'.$this->dic['conf']['www_dir']);
 
-		$output->writeln('----->');
-
-		$output->writeln($this->dic['conf']['command_prefix'].' Done.');
+		$this->log('Hydration finished.');
 
 	}
 }

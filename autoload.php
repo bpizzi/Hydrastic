@@ -7,6 +7,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
 	'Symfony' => __DIR__.'/vendor',
+	'Monolog' => __DIR__.'/vendor/monolog/src',
 	'Hydrastic'   => __DIR__.'/src',
 ));
 $loader->registerPrefixes(array(

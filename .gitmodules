@@ -22,3 +22,6 @@
 [submodule "vendor/texy"]
 	path = vendor/texy
 	url = https://github.com/dg/texy.git
+[submodule "vendor/monolog"]
+	path = vendor/monolog
+	url = https://github.com/Seldaek/monolog.git
