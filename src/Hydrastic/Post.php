@@ -52,8 +52,14 @@ class Post
 
 	public function __toString()
 	{
-		$ret = $this->metadatas['General']['title'];
-		return is_string($ret) ? $ret : "";
+		$ret = '';
+		if ($this->hasMetadata('title')) {
+			$ret = $this->getMetadata('title');
+		} elseif ($this->getFilename() != "") {
+			$ret = $this->getFilename();
+		}
+
+		return $ret;
 	}
 
 	public function setTaxonStorage($taxonStorage)
@@ -91,7 +97,7 @@ class Post
 	public function getMetadata($key)
 	{
 		if (false === array_key_exists($key, $this->metadatas["General"])) {
-			throw new \Exception("You try to access a metadata named $key which is not defined");
+			throw new \LogicException("You tried to access a metadata named $key which is not defined");
 		}
 
 		return $this->metadatas["General"][$key];
@@ -159,7 +165,7 @@ class Post
 	 */
 	public function setTaxonomy($taxonomy) {
 		if (false === is_array($taxonomy)) {
-			throw \Exception('Post->setTaxonomy() only accept arrays, "'.gettype($taxonomy).'" given.');
+			throw \LogicException('Post->setTaxonomy() only accept arrays, "'.gettype($taxonomy).'" given.');
 		}
 		$this->taxonomy = $taxonomy;
 	}
@@ -168,7 +174,7 @@ class Post
 	public function setFileArray($array)
 	{
 		if (false === is_array($array)) {
-     		throw new \Exception('Post->setFileArray() only accept arrays, "'.gettype($array).'" given.');
+			throw new \LogicException('Post->setFileArray() only accept arrays, "'.gettype($array).'" given.');
 		}
 		$this->fileArray = $array;
 	}
@@ -193,7 +199,7 @@ class Post
 	public function addTaxon($taxon)
 	{
 		if (false === is_a($taxon, "Hydrastic\Taxon")) {
-			throw new \Exception("addTaxon except a Hydrastic\Taxon object as a first argument");
+			throw new \LogicException("addTaxon except a Hydrastic\Taxon object as a first argument");
 		}
 		$this->getTaxonStorage()->attach($taxon);
 	}
@@ -207,14 +213,16 @@ class Post
 	public function read($file)
 	{
 		if (false === file_exists($file)) {
-			throw new \Exception("\$post->read() except a valid readable file as first parameter: $file isn't a valid file.");
+			throw new \LogicException("\$post->read() except a valid readable file as first parameter: $file isn't a valid file.");
 		} 
 
 		$this->setFilepath($file);
 		$this->wwwFile = reset(explode('.', end(explode('/',$file))));
 
 		if ('' === file_get_contents($file)) {
-			$this->writeOutput($this->dic['conf']['command_prefix']." <info>".$this->getFilename()."</info> is a blank file, I will skip it.");
+			$msg = " <info>".$this->getFilename()."</info> is a blank file, I will skip it.";
+			$this->writeOutput($this->dic['conf']['command_prefix'].$msg);
+			$this->dic['logger']['hydration']->addError(strip_tags($msg));
 			$this->setIgnored(true);
 			return $this;
 		} 
@@ -237,7 +245,7 @@ class Post
 
 		$this->setFileArray(file($this->getFilepath()));
 		if (false === is_array($this->fileArray)) {
-			throw new \Exception("Post->clean() needs a proper fileArray variable.");
+			throw new \LogicException("Post->clean() needs a proper fileArray variable.");
 		}
 		array_walk($this->fileArray, function(&$item, $key) {
 			$item = str_replace("\n", '', $item);
@@ -276,15 +284,23 @@ class Post
 			}
 		}, $this->dic['conf']);
 
+		if (false === $this->hasMetadata('title')) {
+			$msg = "Please affect a metadata entry 'title' to text file".$this->getFilepath().". Post is ignored.";
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' '.$msg);
+			$this->dic['logger']['hydration']->addError(strip_tags($msg));
+			$this->setIgnored(true);
+			return $this;
+		}
+
 		if (isset($this->metadatas['Taxonomy']) && sizeof($this->metadatas['Taxonomy'])>0) {
 			$this->setTaxonomy($this->metadatas['Taxonomy']);
 		}
 
 		//Setting name+ extension of the file to write
-		if (isset($this->metadatas['General']['slug']) && $this->metadatas['General']['slug'] != "") {
-			$this->setSlug($this->metadatas['General']['slug']);
-		} else {
-			$this->setSlug($this->dic['util']['slugify']->slugify($this->metadatas['General']['title']));
+		if ($this->hasMetadata('slug') && $this->getMetadata('slug') != "") {
+			$this->setSlug($this->getMetadata('slug'));
+		} elseif ($this->hasMetadata('title')) {
+			$this->setSlug($this->dic['util']['slugify']->slugify($this->getMetadata('title')));
 		}
 
 		if (isset($this->dic['conf']['file_extension']) && $this->dic['conf']['file_extension'] != "") {
@@ -373,17 +389,17 @@ class Post
 		}
 
 		if (false === isset($this->dic['taxonomy']) || false === $this->dic['taxonomy']->isInitiated()) {
-			throw new \Exception("You tried to attach a post to the general Taxonomy before having initiated it");
-		}
-
-		if (false === is_string($this->metadatas['General']['title'])) {
-			throw new \Exception("Please affect a metadata entry 'title' to text file".$this->getFilepath());
+			throw new \LogicException("You tried to attach a post to the general Taxonomy before having initiated it");
 		}
 
 		array_walk_recursive($this->getTaxonomy(), function($value, $key, $args) {
 			$taxon = $args['taxonomy']->retrieveTaxonFromName($value);
 			if (false === $taxon) {
-				throw new \Exception("You affected the post named '".$args['postTitle']."' to a Taxon named '$value' which is not declared in your configuration");
+				$msg = "You affected the post '".$args['postTitle']."' to a Taxon named '$value' which is not declared in your configuration. Post is ignored.";
+				$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' '.$msg);
+				$this->dic['logger']['hydration']->addError(strip_tags($msg));
+				$this->setIgnored(true);
+				return $this;
 			}
 			$args['postObject']->addTaxon($taxon);
 			$taxon->addPost($args['postObject']);

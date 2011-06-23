@@ -54,7 +54,7 @@ EOF
 
 	public function log($msg, $level = 'info') 
 	{
-		$msg = ' '.$msg;
+		$msg = ' '.strip_tags($msg);
 		switch ($level) {
 		case "warning":
 			$this->dic['logger']['hydration']->addWarning($msg);
@@ -77,7 +77,7 @@ EOF
 			break;
 		}
 
-		$this->dic['output']->writeln($this->dic['conf']['command_prefix'].' '.$msg);
+		$this->dic['output']->writeln($this->dic['conf']['command_prefix'].$msg);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
