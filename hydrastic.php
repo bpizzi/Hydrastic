@@ -24,6 +24,7 @@ use Hydrastic\Service\Yaml as YamlService;
 use Hydrastic\Service\Finder as FinderService;
 use Hydrastic\Service\Util as UtilService;
 use Hydrastic\Service\TextProcessor as TextProcessorService;
+use Hydrastic\Service\Logger as LoggerService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
@@ -75,6 +76,7 @@ $dic['twig']          = $dic->share(function ($c) { return new TwigService($c); 
 $dic['finder']        = $dic->share(function ($c) { return new FinderService($c); });
 $dic['txt_extensions_registered'] = array();
 $dic['textprocessor'] = $dic->share(function ($c) { return new TextProcessorService($c); });
+$dic['logger'] = $dic->share(function ($c) { return new LoggerService($c); });
 
 // Declare (Symfony Component) Application 
 $dic['hydrastic_app'] = new Application('Hydrastic',$dic['conf']['version']);
