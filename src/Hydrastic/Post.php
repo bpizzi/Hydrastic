@@ -366,7 +366,7 @@ class Post
 		} elseif (isset($this->dic['conf']['metadata_defaults']['General']['post_template'])) {
 			$template = $this->dic['conf']['metadata_defaults']['General']['post_template'];
 		} else {
-			$template = "post.twig";
+			$template = $this->dic['theme']->getConfKey('post_template');
 		}
 
 		$this->setHtml(

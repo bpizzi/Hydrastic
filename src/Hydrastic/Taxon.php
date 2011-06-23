@@ -187,7 +187,7 @@ class Taxon
 	{
 		//Choosing which template to use
 		//TODO: defining theme configuration in a theme config file
-		$template = $this->dic['conf']['taxon_template'];
+		$template = $this->dic['theme']->getConfKey('taxon_template');
 
 		$posts = array();
 		$this->getPostStorage()->rewind();

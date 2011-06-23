@@ -1,0 +1,5 @@
+theme_name: default
+author: Baptiste Pizzighini <baptiste@bpizzi.fr>
+post_template: post.twig
+index_template: index.twig
+taxon_template: taxon.twig

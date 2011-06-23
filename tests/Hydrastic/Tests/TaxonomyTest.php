@@ -12,10 +12,12 @@ require_once 'vfsStream/vfsStream.php';
 
 use Hydrastic\Taxonomy;
 use Hydrastic\Post;
+use Hydrastic\Theme;
 use Hydrastic\Service\Yaml as YamlService;
 use Hydrastic\Service\Finder as FinderService;
 use Hydrastic\Service\Util as UtilService;
 use Hydrastic\Service\Twig as TwigService;
+use Hydrastic\Service\Logger as LoggerService;
 use Hydrastic\Service\TextProcessor as TextProcessorService;
 
 class TaxonomyTest extends PHPUnit_Framework_TestCase
@@ -35,6 +37,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
 		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
 		$this->dic['twig']   = $this->dic->share(function ($c) { return new TwigService($c); });
+		$this->dic['logger']   = $this->dic->share(function ($c) { return new LoggerService($c); });
 		$this->dic['textprocessor'] = $this->dic->share(function ($c) { return new TextProcessorService($c); });
 
 		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml')); 
@@ -42,11 +45,19 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
  		//Mocking the filesystem
 		vfsStreamWrapper::register();
 		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydrasticRoot'));
-
-		//Quickly testing if vfsStream works well... just to be sure...
+		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
+		mkdir(vfsStream::url('hydrasticRoot/log'));
 		mkdir(vfsStream::url('hydrasticRoot/www'));
-		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www'), "www/ should have been created");
 
+		//Load templates in mocked filesystem 
+		vfsStream::newDirectory('tpl/default/')->at(vfsStreamWrapper::getRoot());
+		foreach ($this->dic['finder']['find']->files()->in($this->fixDir.'tpl/default/') as $f) {
+			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
+		}
+
+		//Loading the theme
+		$this->dic['theme'] = new Theme($this->dic);
+		$this->dic['theme']->validate();
 	}
 
 	/**
@@ -169,7 +180,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
 		}
 
-		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
@@ -187,7 +197,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
 		}
 
-		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
 		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 

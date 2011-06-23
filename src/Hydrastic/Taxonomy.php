@@ -359,7 +359,7 @@ class Taxonomy
 			}
 
 			$this->setIndexHtml($this->dic['twig']['parser']->render(
-				$this->dic['conf']['index_template'],
+				$this->dic['theme']->getConfKey('index_template'),
 				array(
 					"title" => "Hydra Accueil",
 					"taxa"  => $firstLevelTaxa,

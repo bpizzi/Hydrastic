@@ -1,0 +1,6 @@
+theme_name: Fixtures Theme
+author: Dark Vador <dark.vador@obsforce.com>
+template_engine: twig
+post_template: post.twig
+index_template: index.twig
+taxon_template: taxon.twig

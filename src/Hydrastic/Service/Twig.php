@@ -24,7 +24,7 @@ class Twig extends Pimple
 		\Twig_Autoloader::register();
 
 		$this['parser'] = $this->share(function () use ($c) {
-			$tplDir = $c['working_directory'].'/'.$c['conf']['tpl_dir'].'/'.$c['conf']['theme'].'/';
+			$tplDir = $c['theme']->getThemeFolder();
 
 			$loader = new \Twig_Loader_Filesystem($tplDir);
 			$twig = new \Twig_Environment($loader, array());

@@ -1,10 +1,10 @@
-version: 0.2
-command_prefix: <info>Hydrastic 0.2></info>
+version: 0.3DEV
+command_prefix: <info>Hydrastic 0.3DEV></info>
 txt_dir: txt
 tpl_dir: tpl
 www_dir: www
 www_file_extension: html
-theme: default
+theme_folder: default
 taxon_template: taxon.twig
 index_template: index.twig
 metadata_defaults: #Metadata shoud be defined for each post

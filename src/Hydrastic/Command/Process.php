@@ -14,6 +14,7 @@ namespace Hydrastic\command;
 use Hydrastic\ArrayMerger;
 use Hydrastic\Post;
 use Hydrastic\Taxonomy;
+use Hydrastic\Theme;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -82,11 +83,24 @@ EOF
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-
 		$this->dic['output'] = $output;
 
-		$this->log('Started hydration of your text files');
+		$this->log('Hydration started.');
 
+		if (false === isset($this->dic['conf']['theme_folder'])) {
+			$this->log('<error>ERROR</error> Please indicate a theme in your config file (key <info>theme_folder</info>)"', 'critical');
+			die();
+		}
+		$theme = new Theme($this->dic);
+		if (false === $theme->isValid()) {
+			$errors = implode($theme->getValidationErrors(),', ');
+			$this->log('<error>ERROR</error> Your theme is invalid. Exiting. ('.$errors.')', 'critical');
+			die();
+		}
+		$this->dic['theme'] = $theme;
+		$this->log("Using <info>$theme</info> theme");
+
+		$this->log('Started hydration of your text files');
 		$files = $this->dic['finder']['txt_files'];
 
 		$this->log('Found <comment>'.count($files).'</comment> text files');
