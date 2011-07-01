@@ -28,6 +28,13 @@ class Logger extends Pimple
 			return $l;
 		});
 
+		//This logger will record to disk the init command
+		$this['init'] = $this->share(function () use ($c) {
+			$l = new MonologLogger('init');
+			$l->pushHandler(new StreamHandler($c['working_directory'].'/log/init.log'));
+			return $l;
+		});
+
 		//TODO: define others loggers to handle pusblishing process, for ex.
 
 	}
