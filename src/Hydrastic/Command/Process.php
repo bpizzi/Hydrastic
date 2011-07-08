@@ -9,7 +9,7 @@
  *
  */
 
-namespace Hydrastic\command;
+namespace Hydrastic\Command;
 
 use Hydrastic\ArrayMerger;
 use Hydrastic\Post;
@@ -105,6 +105,7 @@ EOF
 
 		$this->log('Found <comment>'.count($files).'</comment> text files');
 
+		//initiating taxonomy
 		$taxonomy = $this->dic['taxonomy'];
 		$taxonomy->initiateTaxonStorage();
 
@@ -127,6 +128,9 @@ EOF
 		$taxonomy->createDirectoryStruct();
 
 		$taxonomy->hydrateIndexFile()->writeIndexFile($this->dic['working_directory'].'/'.$this->dic['conf']['www_dir']);
+
+		//Publishing the assets to www dir (only the assets needed by the templates)
+		$this->dic['asset']['manager']->publish();
 
 		$this->log('Hydration finished.');
 

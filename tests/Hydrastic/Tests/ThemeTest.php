@@ -47,6 +47,10 @@ class ThemeTest extends PHPUnit_Framework_TestCase
 		foreach ($this->dic['finder']['find']->files()->in($this->fixDir.'tpl/default/') as $f) {
 			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
 		}
+
+		//Loading the theme
+		$this->dic['theme'] = new Theme($this->dic);
+		$this->dic['theme']->validate();
 	}
 
 	public function testValidate() 
@@ -63,6 +67,11 @@ class ThemeTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('index.twig', $this->dic['theme']->getConfKey('index_template'), 'index_template key is properly retrieved');
 		$this->assertEquals('post.twig', $this->dic['theme']->getConfKey('post_template'), 'post_template key is properly retrieved');
 		$this->assertEquals('taxon.twig', $this->dic['theme']->getConfKey('taxon_template'), 'taxon_template key is properly retrieved');
+	}
+
+	public function testGetThemeFolder() 
+	{
+		$this->assertEquals($this->dic['theme']->getThemeFolder(), 'vfs://hydrasticRoot/tpl/default');
 	}
 
 

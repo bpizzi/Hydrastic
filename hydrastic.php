@@ -19,12 +19,13 @@ use Hydrastic\Command\Compile;
 use Hydrastic\Command\Shell;
 use Hydrastic\Command\Version;
 use Hydrastic\Command\Init;
-use Hydrastic\Service\Twig as TwigService;
-use Hydrastic\Service\Yaml as YamlService;
-use Hydrastic\Service\Finder as FinderService;
-use Hydrastic\Service\Util as UtilService;
-use Hydrastic\Service\TextProcessor as TextProcessorService;
-use Hydrastic\Service\Logger as LoggerService;
+use Hydrastic\Service\Twig           as TwigService;
+use Hydrastic\Service\Yaml           as YamlService;
+use Hydrastic\Service\Finder         as FinderService;
+use Hydrastic\Service\Util           as UtilService;
+use Hydrastic\Service\TextProcessor  as TextProcessorService;
+use Hydrastic\Service\Logger         as LoggerService;
+use Hydrastic\Service\Asset          as AssetService;
 
 // "Dic" stands for Dependency Injection Container
 // It holds configuration variables and services
@@ -72,11 +73,12 @@ $dic['conf'] = $dic['util']['array.merger']->mergeUniqueKeysRecursive($defaultCo
 $dic['taxonomy'] = $dic->share(function ($c) { return new Taxonomy($c); });
 
 // Register services
-$dic['twig']          = $dic->share(function ($c) { return new TwigService($c); });
-$dic['finder']        = $dic->share(function ($c) { return new FinderService($c); });
+$dic['twig']                      = $dic->share(function ($c) { return new TwigService($c); });
+$dic['finder']                    = $dic->share(function ($c) { return new FinderService($c); });
 $dic['txt_extensions_registered'] = array();
-$dic['textprocessor'] = $dic->share(function ($c) { return new TextProcessorService($c); });
-$dic['logger'] = $dic->share(function ($c) { return new LoggerService($c); });
+$dic['textprocessor']             = $dic->share(function ($c) { return new TextProcessorService($c); });
+$dic['logger']                    = $dic->share(function ($c) { return new LoggerService($c); });
+$dic['asset']                     = $dic->share(function ($c) { return new AssetService($c); });
 
 // Declare (Symfony Component) Application 
 $dic['hydrastic_app'] = new Application('Hydrastic',$dic['conf']['version']);

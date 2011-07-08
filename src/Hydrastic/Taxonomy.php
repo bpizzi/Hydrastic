@@ -361,8 +361,9 @@ class Taxonomy
 			$this->setIndexHtml($this->dic['twig']['parser']->render(
 				$this->dic['theme']->getConfKey('index_template'),
 				array(
-					"title" => "Hydra Accueil",
-					"taxa"  => $firstLevelTaxa,
+					"title"  => "Hydra Accueil",
+					"taxa"   => $firstLevelTaxa,
+					"assets" => $this->dic['asset']['manager'],
 				)
 			)); 
 

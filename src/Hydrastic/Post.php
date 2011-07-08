@@ -374,7 +374,10 @@ class Post
 				$template,
 				array_merge(
 					$this->metadatas['General'],
-					array("content" => $this->getContent())
+					array(
+						"content" => $this->getContent(),
+						"assets"  => $this->dic['asset']['manager'],
+					)
 				)
 			)
 		); 

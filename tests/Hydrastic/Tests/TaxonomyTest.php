@@ -13,12 +13,13 @@ require_once 'vfsStream/vfsStream.php';
 use Hydrastic\Taxonomy;
 use Hydrastic\Post;
 use Hydrastic\Theme;
-use Hydrastic\Service\Yaml as YamlService;
-use Hydrastic\Service\Finder as FinderService;
-use Hydrastic\Service\Util as UtilService;
-use Hydrastic\Service\Twig as TwigService;
-use Hydrastic\Service\Logger as LoggerService;
-use Hydrastic\Service\TextProcessor as TextProcessorService;
+use Hydrastic\Service\Yaml           as YamlService;
+use Hydrastic\Service\Finder         as FinderService;
+use Hydrastic\Service\Util           as UtilService;
+use Hydrastic\Service\Twig           as TwigService;
+use Hydrastic\Service\Logger         as LoggerService;
+use Hydrastic\Service\TextProcessor  as TextProcessorService;
+use Hydrastic\Service\Asset          as AssetService;
 
 class TaxonomyTest extends PHPUnit_Framework_TestCase
 {
@@ -32,15 +33,16 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		$this->dic = new Pimple();
 		$this->dic['hydrastic_dir'] = __DIR__.'/../../../';
-		$this->dic['yaml'] = $this->dic->share(function ($c) { return new YamlService($c); });
-		$this->dic['finder'] = $this->dic->share(function ($c) { return new FinderService($c); });
-		$this->dic['taxonomy'] = $this->dic->share(function ($c) { return new Taxonomy($c); });
-		$this->dic['util'] = $this->dic->share(function ($c) { return new UtilService($c); });
-		$this->dic['twig']   = $this->dic->share(function ($c) { return new TwigService($c); });
-		$this->dic['logger']   = $this->dic->share(function ($c) { return new LoggerService($c); });
+		$this->dic['yaml']          = $this->dic->share(function ($c) { return new YamlService($c); });
+		$this->dic['finder']        = $this->dic->share(function ($c) { return new FinderService($c); });
+		$this->dic['taxonomy']      = $this->dic->share(function ($c) { return new Taxonomy($c); });
+		$this->dic['util']          = $this->dic->share(function ($c) { return new UtilService($c); });
+		$this->dic['twig']          = $this->dic->share(function ($c) { return new TwigService($c); });
+		$this->dic['asset']         = $this->dic->share(function ($c) { return new AssetService($c); });
+		$this->dic['logger']        = $this->dic->share(function ($c) { return new LoggerService($c); });
 		$this->dic['textprocessor'] = $this->dic->share(function ($c) { return new TextProcessorService($c); });
 
-		$this->dic['conf'] = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml')); 
+		$this->dic['conf']          = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml'));
 
  		//Mocking the filesystem
 		vfsStreamWrapper::register();

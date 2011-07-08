@@ -9,10 +9,11 @@
  *
  */
 
-namespace Hydrastic\command;
+namespace Hydrastic\Command;
 
 use Hydrastic\Command\HydraCommandBase;
 
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -31,7 +31,7 @@ class TaxonTest extends PHPUnit_Framework_TestCase
 	public function testConstruct()
 	{
 		$taxon = new Taxon($this->dic);
-		$taxon->setName('This is a nice Cat');
+		$taxon->setName('This is a nice Cat !');
 
 		$this->assertEquals($taxon->getSlug(), 'this-is-a-nice-cat', 'Taxon automatic slugging is correctly handled');
 	}
