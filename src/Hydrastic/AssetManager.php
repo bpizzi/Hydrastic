@@ -29,7 +29,7 @@ class AssetManager implements \ArrayAccess
 	}
 
 	/**
- 	 * Extracting the filename from $filePath
+	 * Extracting the filename from $filePath
 	 */
 	public function extractFilenameIn($filePath)
 	{
@@ -55,65 +55,23 @@ class AssetManager implements \ArrayAccess
 	}
 
 	/**
-	 * Returns a Finder instance for $filepath
-	 */
-	public function getFinderFor($filePath)
-	{
-		//Find the file
-		$fileName = $this->extractFilenameIn($filePath);
-		$folderName = $this->extractFoldernameIn($filePath);
-		$finder = $this->dic['finder']['find']
-			->files()
-			->name($fileName);
-		if (false === is_null($folderName)) {
-			$finder->in($this->dic['theme']->getThemeFolder());
-		}
-
-		return $finder;
-	}
-
-	/**
- 	 * Return the first SplFileInfo object found by the finder for $filepath
-	 */
-	public function getSplFileInfoFor($filePath)
-	{
-		return reset(iterator_to_array($this->getFinderFor($filePath)));
-	}
-
-	/**
-	 * Test if the specified file exists somewhere in the theme folder.
-	 * Log the event if not.
-	 */
-	public function fileExists($filePath) 
-	{
-		if (iterator_count($this->getFinderFor($filePath)) === 0) {
-			$this->dic['logger']['hydration']->addWarning("Your theme calls an unexisting asset ($offset)");
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Set the offset value only if the corresponding file exists
 	 */
 	public function offsetSet($offset, $value) {
-		if ($this->fileExists($offset)) {
-			$file = $this->getSplFileInfoFor($offset);
-			$this->array[$offset] = $file->getRealPath();
-		}
+		$this->array[$offset] = $value;
 	}
 
 	/**
-	 * Try to set the offset before returning it existance status
+	 * Don't try to set the offset before returning it existance status
+	 * Even if the offset do exist on disk, we have to get/set if before, 
+	 * in order to initialize it
 	 */
 	public function offsetExists($offset) {
-		$this->offsetSet($offset);
 		return isset($this->array[$offset]);
 	}
 
 	/**
- 	 * Unset the offset, don't touch the filesystem
+	 * Unset the offset, don't touch the filesystem
 	 */
 	public function offsetUnset($offset) {
 		unset($this->array[$offset]);
@@ -123,16 +81,20 @@ class AssetManager implements \ArrayAccess
 	 * Try to set the offset before returning its value
 	 */
 	public function offsetGet($offset) {
-		echo "Get $offset\n";
-		$this->offsetSet($offset, null);
-		return isset($this->array[$offset]) ? $this->array[$offset] : null;
-	}
+		//echo "\nTrying to get: $offset\n";
+		if(false === $this->offsetExists($offset)) {
+			$filePath = $this->dic['theme']->getThemeFolder()."/".$offset;
+			//echo "\nTesting file existance : $filePath\n";
+			if (file_exists($filePath)) {
+				$this->array[$offset] = $filePath;
+				//echo "\nSetted array[\"$offset\"] = ".$this->array[$offset]."\n";
+			} else {
+				$this->dic['logger']['hydration']->addWarning("Your theme calls an unexisting asset ($filePath)");
+				//echo "\nDidn't Setted array[\"$offset\"] because ".$filePath." isn't a valid file\n";
+			}
+		}
 
-	/**
-	 * Return the full filepath to the file corresponding to $asset
-	 */
-	public function getPathTo($asset) {
-		return $path;
+		return isset($this->array[$offset]) ? $this->array[$offset] : false;
 	}
 
 	/**
@@ -140,17 +102,21 @@ class AssetManager implements \ArrayAccess
 	 */
 	public function publish()
 	{
-		$assetDir = $this->dic['conf']['www_dir'].'/assets';
+		$assetDir = $this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/assets';
+		//echo "\nMkdir $assetDir\n";
 		mkdir($assetDir);
-		foreach ($this as $relativeFilepath => $fullPath) {
-			$fileName = $this->extractFilenameIn($relativeFilepath);
+		foreach ($this->array as $relativeFilepath => $fullPath) {
+			$destinationPath = $assetDir .'/'. $this->extractFilenameIn($relativeFilepath);
+			//echo "copying $fullPath to $destinationPath\n";
 
 			//TODO: gérer les sous-dir
 			//TODO: gérer les post-process selon le type d'asset
-			if (!copy($fullPath, $assetDir.'/'.$fileName)) {
-				$this->dic['logger']['hydration']->addError("<error>ERROR</error> when copying $fileName to $assetDir");
+			if (false === copy($fullPath, $destinationPath)) {
+				//echo "Error when copying ".$fullPath."\n";
+				$this->dic['logger']['hydration']->addError("<error>ERROR</error> when copying $fullPath to $destinationPath");
 			} else {
-				$this->dic['logger']['hydration']->addInfo("Asset hydration: copying $fileName to $assetDir");
+				//echo "Copied $fullPath to $destinationPath\n";
+				$this->dic['logger']['hydration']->addInfo("Asset hydration: copying $fullPath to $destinationPath");
 			}
 		}
 	}

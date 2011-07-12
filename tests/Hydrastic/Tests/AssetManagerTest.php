@@ -78,20 +78,44 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($this->dic['asset']['manager']->extractFoldernameIn('/filename.ext'), '');
 	}
 
+	public function testOffsetExists()
+	{
+		$this->assertEquals(isset($this->dic['asset']['manager']['blank.png']), false, 'An offset isn\'t yet setted');
+		$asset = $this->dic['asset']['manager']['blank.png'];
+		$this->assertEquals(isset($this->dic['asset']['manager']['blank.png']), true, 'An offset is setted after having been accessed.');
+	}
+
 	public function testOffsetGet()
 	{
 		$contentFromDisk = file_get_contents(vfsStream::url('tpl/default/blank.png'));
 		$contentFromAssetManager = file_get_contents($this->dic['asset']['manager']['blank.png']);
 		$this->assertEquals($contentFromDisk, $contentFromAssetManager);
-
-		$nonExistantAsset = file_get_contents($this->dic['asset']['manager']['nonexistantfile']);
-		echo $nonExistantAsset;
-		$this->assertEquals(null, $nonExistantAsset);
 	}
 
 	public function testPublish()
 	{
 
+		$asset = $this->dic['asset']['manager']['blank.png'];
+		$asset1 = $this->dic['asset']['manager']['blank1.png'];
+		$asset2 = $this->dic['asset']['manager']['blank2.png'];
+		$asset2 = $this->dic['asset']['manager']['dummy.jpg'];
+		$this->dic['asset']['manager']->publish();
+
+		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/blank.png'));
+		$contentFromWww = file_get_contents(vfsStream::url('www/assets/blank.png'));
+		$this->assertEquals($contentFromTpl, $contentFromWww, 'File blank.png published correctly');
+
+		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/blank1.png'));
+		$contentFromWww = file_get_contents(vfsStream::url('www/assets/blank1.png'));
+		$this->assertEquals($contentFromTpl, $contentFromWww, 'File blank1.png published correctly');
+
+		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/blank2.png'));
+		$contentFromWww = file_get_contents(vfsStream::url('www/assets/blank2.png'));
+		$this->assertEquals($contentFromTpl, $contentFromWww, 'File blank2.png published correctly');
+
+		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/dummy.jpg'));
+		$contentFromWww = file_get_contents(vfsStream::url('www/assets/dummy.jpg'));
+		$this->assertEquals($contentFromTpl, $contentFromWww, 'File dummy.jpg');
 	}
 
 }
