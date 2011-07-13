@@ -56,6 +56,13 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 		foreach ($this->dic['finder']['find']->files()->in($this->fixDir.'tpl/default/') as $f) {
 			vfsStream::newFile($f->getFilename())->withContent(file_get_contents($f))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
 		}
+		//Declaring some nested file by hand... #lazydev
+		vfsStream::newDirectory('js/')->at(vfsStreamWrapper::getRoot()->getChild('tpl/default'));
+		vfsStream::newFile('f.js')->withContent(file_get_contents($this->fixDir.'tpl/default/js'))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default/js'));
+		vfsStream::newDirectory('subjs1/')->at(vfsStreamWrapper::getRoot()->getChild('tpl/default/js'));
+		vfsStream::newFile('f1.js')->withContent(file_get_contents($this->fixDir.'tpl/default/js/subjs1/f1.js'))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default/js/subjs1'));
+		vfsStream::newDirectory('subjs2')->at(vfsStreamWrapper::getRoot()->getChild('tpl/default/js/subjs1'));
+		vfsStream::newFile('f2.js')->withContent(file_get_contents($this->fixDir.'tpl/default/js/subjs1/subjs2/f2.js'))->at(vfsStreamWrapper::getRoot()->getChild('tpl/default/js/subjs1/subjs2'));
 
 		//Loading the theme
 		$this->dic['theme'] = new Theme($this->dic);
@@ -92,14 +99,32 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($contentFromDisk, $contentFromAssetManager);
 	}
 
+	/**
+ 	 * @expectedException Exception
+	 */
+	public function testOffsetGetWhenAssetIsInexistant()
+	{
+		$js2 = $this->dic['asset']['manager']['nonexistant.txt'];
+	}
+
 	public function testPublish()
 	{
 
 		$asset = $this->dic['asset']['manager']['blank.png'];
 		$asset1 = $this->dic['asset']['manager']['blank1.png'];
 		$asset2 = $this->dic['asset']['manager']['blank2.png'];
-		$asset2 = $this->dic['asset']['manager']['dummy.jpg'];
+		$asset3 = $this->dic['asset']['manager']['dummy.jpg'];
+		$js = $this->dic['asset']['manager']['js/f.js'];
+		$js1 = $this->dic['asset']['manager']['js/subjs1/f1.js'];
+		$js2 = $this->dic['asset']['manager']['js/subjs1/subjs2/f2.js'];
 		$this->dic['asset']['manager']->publish();
+
+		$this->assertTrue(isset($this->dic['asset']['manager']['blank.png']));
+		$this->assertTrue(isset($this->dic['asset']['manager']['blank1.png']));
+		$this->assertTrue(isset($this->dic['asset']['manager']['blank2.png']));
+		$this->assertTrue(isset($this->dic['asset']['manager']['dummy.jpg']));
+		$this->assertTrue(isset($this->dic['asset']['manager']['js/f.js']));
+		$this->assertTrue(isset($this->dic['asset']['manager']['js/subjs1/f1.js']));
 
 		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/blank.png'));
 		$contentFromWww = file_get_contents(vfsStream::url('www/assets/blank.png'));
@@ -116,6 +141,14 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/dummy.jpg'));
 		$contentFromWww = file_get_contents(vfsStream::url('www/assets/dummy.jpg'));
 		$this->assertEquals($contentFromTpl, $contentFromWww, 'File dummy.jpg');
+
+		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/js/f.js'));
+		$contentFromWww = file_get_contents(vfsStream::url('www/assets/js/f.js'));
+		$this->assertEquals($contentFromTpl, $contentFromWww, 'File js/f.js');
+
+		$contentFromTpl = file_get_contents(vfsStream::url('tpl/default/js/subjs1/f1.js'));
+		$contentFromWww = file_get_contents(vfsStream::url('www/assets/js/subjs1/f1.js'));
+		$this->assertEquals($contentFromTpl, $contentFromWww, 'File js/subjs1/f1.js');
 	}
 
 }

@@ -81,16 +81,15 @@ class AssetManager implements \ArrayAccess
 	 * Try to set the offset before returning its value
 	 */
 	public function offsetGet($offset) {
-		//echo "\nTrying to get: $offset\n";
+		//trying to get $offset
 		if(false === $this->offsetExists($offset)) {
+			//Testing file existance for filepath
 			$filePath = $this->dic['theme']->getThemeFolder()."/".$offset;
-			//echo "\nTesting file existance : $filePath\n";
 			if (file_exists($filePath)) {
 				$this->array[$offset] = $filePath;
-				//echo "\nSetted array[\"$offset\"] = ".$this->array[$offset]."\n";
 			} else {
-				$this->dic['logger']['hydration']->addWarning("Your theme calls an unexisting asset ($filePath)");
-				//echo "\nDidn't Setted array[\"$offset\"] because ".$filePath." isn't a valid file\n";
+				$this->dic['logger']['hydration']->addCritical("Your theme calls an unexisting asset ($filePath)");
+				throw new \LogicException("You tried to access an asset which not exist: $filePath");
 			}
 		}
 
@@ -103,19 +102,31 @@ class AssetManager implements \ArrayAccess
 	public function publish()
 	{
 		$assetDir = $this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/assets';
-		//echo "\nMkdir $assetDir\n";
 		mkdir($assetDir);
 		foreach ($this->array as $relativeFilepath => $fullPath) {
-			$destinationPath = $assetDir .'/'. $this->extractFilenameIn($relativeFilepath);
-			//echo "copying $fullPath to $destinationPath\n";
+			//Copying the asset to www_dir
+			$destinationPath = $assetDir .'/'. $relativeFilepath;
 
-			//TODO: gérer les sous-dir
-			//TODO: gérer les post-process selon le type d'asset
+			//Handling the subfolders
+			$subfolders = explode('/', str_replace($this->extractFilenameIn($relativeFilepath), '', $relativeFilepath));
+			if (sizeof($subfolders) > 1) {
+				$currentPath = '';
+				foreach ($subfolders as $folder) {
+					if ($folder !== "") {
+						$newDir = $assetDir.'/'.$currentPath.$folder;
+						$currentPath .= $folder.'/';
+						if (false === is_dir($newDir)) {
+							//create the subfolder if needed
+							mkdir($newDir);
+						} 
+					}
+				}
+			}
+
+			//TODO: handle asset post process
 			if (false === copy($fullPath, $destinationPath)) {
-				//echo "Error when copying ".$fullPath."\n";
 				$this->dic['logger']['hydration']->addError("<error>ERROR</error> when copying $fullPath to $destinationPath");
 			} else {
-				//echo "Copied $fullPath to $destinationPath\n";
 				$this->dic['logger']['hydration']->addInfo("Asset hydration: copying $fullPath to $destinationPath");
 			}
 		}
