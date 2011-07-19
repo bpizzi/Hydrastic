@@ -19,6 +19,7 @@ use Hydrastic\Command\Compile;
 use Hydrastic\Command\Shell;
 use Hydrastic\Command\Version;
 use Hydrastic\Command\Init;
+use Hydrastic\Command\Watch;
 use Hydrastic\Service\Twig           as TwigService;
 use Hydrastic\Service\Yaml           as YamlService;
 use Hydrastic\Service\Finder         as FinderService;
@@ -89,14 +90,13 @@ $commands = array(
 	new Shell($dic),
 	new Version($dic),
 	new Init($dic),
+	new Watch($dic),
 );
 if (false === $dic['inside_phar']) {
 	$commands[] = new Compile($dic);
 }
 
-foreach ($commands as $c) {
-	$dic['hydrastic_app']->add($c);
-}
+$dic['hydrastic_app']->addCommands($commands);
 
 //Run the Application
 $dic['hydrastic_app']->run();

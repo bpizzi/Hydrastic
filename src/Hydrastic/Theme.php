@@ -115,5 +115,46 @@ class Theme
 		return $this->conf[$k];
 	}
 
+	/**
+	 * Put all theme assets (images, css, js) into www_dir
+	 **/
+	public function publish() 
+	{
+
+		switch (PHP_OS) {
+		case "Linux":
+		case "FreeBSD":
+		case "NetBSD":
+		case "OpenBSD":
+		case "Unix":
+		case "Darwin":
+			$cmdPattern = "cp -rf %s %s";
+			break;
+		case "WINNT":
+		case "WIN32":
+		case "Windows":
+			$cmdPattern = "xcopy %s %s /e/i";
+			break;
+		default:
+			break;
+		}
+
+		foreach ($this->getConfKey('asset_folders') as $f) {
+			$nbFileCopied = 0;
+
+			$fromDir = $this->getThemeFolder().'/'.$f;
+			$toDir = $this->dic['working_directory'].'/'.$this->dic['conf']['www_dir'].'/assets/'.$f;
+			$finder = $this->dic["finder"]["find"]->files()->in($fromDir);
+			$nbFileCopied = iterator_count($finder);
+			$cmd = sprintf($cmdPattern, $fromDir, $toDir);
+
+			$logMsg = " Copied $nbFileCopied files from $fromDir to $toDir.";
+			$this->dic['output']->writeln($this->dic['conf']['command_prefix'].$logMsg);
+			$this->dic['logger']['hydration']->addInfo($logMsg);
+
+			//echo $cmd."\n";
+		}
+
+	}
 }
 

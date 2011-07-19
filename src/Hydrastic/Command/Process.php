@@ -99,6 +99,7 @@ EOF
 		}
 		$this->dic['theme'] = $theme;
 		$this->log("Using <info>$theme</info> theme");
+		$this->dic['theme']->publish();
 
 		$this->log('Started hydration of your text files');
 		$files = $this->dic['finder']['txt_files'];
