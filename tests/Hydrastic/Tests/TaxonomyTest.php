@@ -44,7 +44,7 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		$this->dic['conf']          = $this->dic['yaml']['parser']->parse(file_get_contents($this->fixDir.'hydrastic-conf-1.yml'));
 
- 		//Mocking the filesystem
+		//Mocking the filesystem
 		vfsStreamWrapper::register();
 		vfsStreamWrapper::setRoot(new vfsStreamDirectory('hydrasticRoot'));
 		$this->dic['working_directory'] = vfsStream::url('hydrasticRoot');
@@ -64,7 +64,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 *
-	 * @test
 	 * @group TaxonomyGeneration
 	 */
 	public function testParsingCorrectlyYamlTaxonomyFile()
@@ -91,7 +90,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 *
-	 * @test
 	 * @group TaxonomyGeneration
 	 */
 	public function testTaxonomyInitiateCorrectlyItsTaxonStorage()
@@ -134,7 +132,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 *
-	 * @test
 	 * @group TaxonomyGeneration
 	 */
 	public function testMutualAttachBetweenTaxonAndPost()
@@ -170,7 +167,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 	 *   $ pear channel-discover pear.php-tools.net
 	 *   $ pear install pat/vfsStream-beta
 	 *
-	 * @test
 	 * @group WritingToDisc
 	 */
 	public function testCreateDirectoryStruct()
@@ -200,7 +196,6 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 		}
 
 		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
-		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
 
 		$post = new Post($this->dic);
 		$post->read($this->fixDir.'txt/post-1.txt')
@@ -210,8 +205,20 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 			->hydrate()
 			->attachToTaxonomy();
 
-		//$this->assertTrue(file_exists(vfsStream::url('www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
-		//$this->assertTrue(file_exists(vfsStream::url('www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
+		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
+
+		$this->assertTrue(file_exists(vfsStream::url('www/tag/tag2/title.html')), "title.html should have been written in tag/tag2");
+		$this->assertTrue(file_exists(vfsStream::url('www/cat/cat1/subcat1/elem1subcat1/title.html')), "title.html should have been written in cat/cat1/subcat1/elem1subcat1");
 	}
-	 
+
+	/**
+	 * This test is just to kill a nasty bug where terminal taxon is duplicated
+	 *
+	 *
+	 **/
+	public function testBugDuplicateTaxonEntry()
+	{
+
+	}
+
 }
