@@ -113,12 +113,16 @@ EOF
 		foreach ($files as $file) {
 			$post = new Post($this->dic);
 
+			try {
 			$post->read($file)
 				->clean()
 				->parseMetas()
 				->parseContent()
 				->hydrate()
 				->attachToTaxonomy();
+			} catch (\Exception $e) {
+				$this->log("<error>ERROR</error> $file: ".$e->getMessage(), 'error');
+			}
 		} //-- parsing content files
 
 		if ($input->getOptions('f')) {

@@ -269,7 +269,7 @@ class Post
 		$metaDatasStr =  implode(chr(13), array_slice($this->fileArray, 0, array_search("---", $this->fileArray)));                 
 
 		if ("" === $metaDatasStr) {
-			throw new \Exception("The file $this has no metadata");
+			throw new \LogicException("The file $this has no metadata");
 		}
 
 		// Parse the metadatas in a array, using defaults when necessary

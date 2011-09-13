@@ -29,6 +29,8 @@ class Finder extends Pimple
 			$f = new SymfonyFinder();
 			$f->files()
 				->ignoreVCS(true)
+				->notName('.*')
+				->notName('*~')
 				->in($txtDir);
 
 			foreach ($c['txt_extensions_registered'] as $extension) {

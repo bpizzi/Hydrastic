@@ -117,12 +117,14 @@ EOF
 		$this->log('Will launch hydrastic:process each time a file change in those folders... Hit CTRL+C to end.');
 
 		//Looping forever: reads events from inotify and launch Process when a file change
+		$this->dic['hydrastic_app']->setAutoExit(false);
 		while(true) {
 			$r = inotify_read($i);
 			foreach ($r as $event => $details) {
 				if ($details["name"] !== "" && substr($details["name"], 0, 1) !== ".") {
 					$this->log('One file changed : '.$details["name"]."\n");
 					$this->dic['hydrastic_app']->run(new StringInput('hydrastic:process'), new ConsoleOutput());
+					$this->dic['hydrastic_app']->run(new StringInput('hydrastic:watch'), new ConsoleOutput());
 				}
 			}
 		}
