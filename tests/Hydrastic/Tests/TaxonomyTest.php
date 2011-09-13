@@ -219,6 +219,13 @@ class TaxonomyTest extends PHPUnit_Framework_TestCase
 	public function testBugDuplicateTaxonEntry()
 	{
 
+		$this->dic['taxonomy']->initiateTaxonStorage();  //Read and initiate taxon storage
+		$this->dic['taxonomy']->createDirectoryStruct(); //Create directory structure corresponding to the taxon storage
+
+		$this->assertTrue(vfsStreamWrapper::getRoot()->hasChild('www/tag/tag1'), "www/tag/tag1 should have been created");
+		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/tag1/tag1'), "www/tag/tag1/tag1 shouldn't have been created");
+		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('www/tag/tag2/tag2'), "www/tag/tag1/tag1 shouldn't have been created");
+
 	}
 
 }

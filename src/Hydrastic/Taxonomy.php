@@ -134,13 +134,13 @@ class Taxonomy
 				$parent->addChild($subParent);
 			}
 
-			if (is_array($child)) {
+			if (is_array($child) && sizeof($child) > 0) {
 				//If the taxon as children
 				//echo "  Going into deep init for ".sizeof($child)." children of : $parentName\n";
 				$this->initiateTaxonStorage($child, &$subParent, $level); 
-			} else {
+			} elseif ($child != $subParent) {
 				$newChildLevel = $level + 1;
-				//echo "  New child : $child, level $newChildLevel\n";
+				//echo "New child for $subParent : $child, level $newChildLevel\n";
 				$newChild = new Taxon($this->dic);
 				$newChild->setName($child);
 				$newChild->setLevel($newChildLevel);
